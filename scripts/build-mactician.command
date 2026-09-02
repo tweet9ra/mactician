@@ -141,6 +141,7 @@ done
 
 copy_plain_file "$PROJECT_DIR/run-tft-root-affinity.command" "$RUNTIME_TEMPLATE/run-tft-root-affinity.command"
 copy_plain_file "$PROJECT_DIR/run-tft-angle-opengl.command" "$RUNTIME_TEMPLATE/run-tft-angle-opengl.command"
+copy_plain_file "$PROJECT_DIR/run-tft-google-play.command" "$RUNTIME_TEMPLATE/run-tft-google-play.command"
 copy_plain_file "$PROJECT_DIR/scripts/run-asg-experiment.command" "$RUNTIME_TEMPLATE/scripts/run-asg-experiment.command"
 copy_plain_file "$PROJECT_DIR/scripts/watch-root-pso.command" "$RUNTIME_TEMPLATE/scripts/watch-root-pso.command"
 copy_plain_file "$PROJECT_DIR/scripts/update-tft-performance-mode.command" "$RUNTIME_TEMPLATE/scripts/update-tft-performance-mode.command"
@@ -156,6 +157,7 @@ copy_plain_file "$PROJECT_DIR/artifacts/tft-pbe-18.1-5212127-angle-opengl/Androi
 chmod 755 \
     "$RUNTIME_TEMPLATE/run-tft-root-affinity.command" \
     "$RUNTIME_TEMPLATE/run-tft-angle-opengl.command" \
+    "$RUNTIME_TEMPLATE/run-tft-google-play.command" \
     "$RUNTIME_TEMPLATE/scripts/run-asg-experiment.command" \
     "$RUNTIME_TEMPLATE/scripts/watch-root-pso.command" \
     "$RUNTIME_TEMPLATE/scripts/update-tft-performance-mode.command" \

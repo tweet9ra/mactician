@@ -3,7 +3,7 @@ set -euo pipefail
 
 readonly PROJECT_DIR="${0:A:h:h}"
 readonly LAUNCHER_DIR="$PROJECT_DIR/launcher"
-readonly APP_RESOURCES="$PROJECT_DIR/dist/Mactician.app/Contents/Resources"
+readonly APP_RESOURCES="${MACTICIAN_APP_RESOURCES:-$PROJECT_DIR/dist/Mactician.app/Contents/Resources}"
 readonly TEST_ROOT="$(mktemp -d /tmp/mactician-integration.XXXXXX)"
 readonly TEST_BINARY="$TEST_ROOT/InstallerIntegration"
 readonly FIXTURE_DIR="$LAUNCHER_DIR/.build/integration-fixtures"
@@ -48,9 +48,9 @@ download_fixture \
     https://dl.google.com/android/repository/emulator-darwin_aarch64-15917651.zip \
     22530de9363f34ea945ecb5cad74523abd4b615f27f3c1a9899efb183ea9e144
 download_fixture \
-    arm64-v8a-36_r07.zip \
-    https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-36_r07.zip \
-    fb47d861d6f87230ee0fe70f610d579935ca77f41a0eefbf391595d3dc4b5ee2
+    arm64-v8a-36_r07-playstore.zip \
+    https://dl.google.com/android/repository/sys-img/google_apis_playstore/arm64-v8a-36_r07.zip \
+    ddb0feff5c23db9f42ceabd28f6542e8ffec639abf818bf6831a2658e6cf7905
 
 mkdir -p "$LAUNCHER_DIR/.build/module-cache"
 xcrun swiftc \
@@ -71,4 +71,4 @@ xcrun swiftc \
     "$APP_RESOURCES" \
     "$FIXTURE_DIR/platform-tools_r36.0.2-darwin.zip" \
     "$FIXTURE_DIR/emulator-darwin_aarch64-15917651.zip" \
-    "$FIXTURE_DIR/arm64-v8a-36_r07.zip"
+    "$FIXTURE_DIR/arm64-v8a-36_r07-playstore.zip"

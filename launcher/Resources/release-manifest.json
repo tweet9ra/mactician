@@ -22,12 +22,12 @@
     },
     {
       "id": "system-image",
-      "version": "android-36-google_apis-arm64-v8a-r07",
-      "url": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-36_r07.zip",
-      "size": 1872691175,
-      "sha256": "fb47d861d6f87230ee0fe70f610d579935ca77f41a0eefbf391595d3dc4b5ee2",
+      "version": "android-36-google_apis_playstore-arm64-v8a-r07",
+      "url": "https://dl.google.com/android/repository/sys-img/google_apis_playstore/arm64-v8a-36_r07.zip",
+      "size": 1886527965,
+      "sha256": "ddb0feff5c23db9f42ceabd28f6542e8ffec639abf818bf6831a2658e6cf7905",
       "archiveRoot": "arm64-v8a",
-      "installPath": "sdk/system-images/android-36/google_apis/arm64-v8a"
+      "installPath": "sdk/system-images/android-36/google_apis_playstore/arm64-v8a"
     }
   ],
   "game": {

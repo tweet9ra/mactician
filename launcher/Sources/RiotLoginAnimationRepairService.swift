@@ -9,19 +9,28 @@ import Foundation
 /// those two presentation animations. It never focuses a field, opens the
 /// keyboard, or reads/writes form values.
 final class RiotLoginAnimationRepairService {
-    private static let package = "com.riotgames.league.teamfighttactics"
     private static let loginActivity = "com.riotgames.platformui.mobilefre.MobileFREWebViewActivity"
-    private static let loginComponent = "\(package)/\(loginActivity)"
     private static let adbServerPort = "5038"
 
     private let queue = DispatchQueue(label: "dev.sergeinaumov.mactician.riot-login-animation-repair")
     private let generationLock = NSLock()
     private var generation = 0
 
-    func start(adb: URL, serial: String = "emulator-5582", log: URL) {
+    func start(
+        adb: URL,
+        package: String,
+        serial: String = "emulator-5582",
+        log: URL
+    ) {
         let token = nextGeneration()
         queue.async { [weak self] in
-            self?.watch(adb: adb, serial: serial, log: log, generation: token)
+            self?.watch(
+                adb: adb,
+                package: package,
+                serial: serial,
+                log: log,
+                generation: token
+            )
         }
     }
 
@@ -29,19 +38,25 @@ final class RiotLoginAnimationRepairService {
         _ = nextGeneration()
     }
 
-    private func watch(adb: URL, serial: String, log: URL, generation token: Int) {
+    private func watch(
+        adb: URL,
+        package: String,
+        serial: String,
+        log: URL,
+        generation token: Int
+    ) {
         var repairedPID: Int?
         var lastFailureLog = Date.distantPast
 
         while isCurrent(token) {
             autoreleasepool {
                 guard deviceIsReady(adb: adb, serial: serial),
-                      loginIsTopActivity(adb: adb, serial: serial) else {
+                      loginIsTopActivity(adb: adb, package: package, serial: serial) else {
                     repairedPID = nil
                     return
                 }
 
-                guard let pid = applicationPID(adb: adb, serial: serial) else {
+                guard let pid = applicationPID(adb: adb, package: package, serial: serial) else {
                     return
                 }
                 guard repairedPID != pid else { return }
@@ -80,7 +95,7 @@ final class RiotLoginAnimationRepairService {
         return state.trimmingCharacters(in: .whitespacesAndNewlines) == "device"
     }
 
-    private func loginIsTopActivity(adb: URL, serial: String) -> Bool {
+    private func loginIsTopActivity(adb: URL, package: String, serial: String) -> Bool {
         guard let activities = try? runADB(
             adb,
             serial: serial,
@@ -89,14 +104,14 @@ final class RiotLoginAnimationRepairService {
         guard let topLine = activities.split(separator: "\n").first(where: {
             $0.contains("topResumedActivity=ActivityRecord")
         }) else { return false }
-        return topLine.contains(Self.loginComponent)
+        return topLine.contains("\(package)/\(Self.loginActivity)")
     }
 
-    private func applicationPID(adb: URL, serial: String) -> Int? {
+    private func applicationPID(adb: URL, package: String, serial: String) -> Int? {
         guard let output = try? runADB(
             adb,
             serial: serial,
-            arguments: ["shell", "pidof", Self.package]
+            arguments: ["shell", "pidof", package]
         ) else { return nil }
         return output.split(whereSeparator: { $0.isWhitespace }).compactMap { Int($0) }.first
     }

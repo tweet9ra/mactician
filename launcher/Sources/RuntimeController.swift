@@ -31,6 +31,7 @@ final class RuntimeController {
             throw LauncherError.process("TFT is already launching")
         }
         guard state.isReady,
+              state.gamePackageName.map({ $0 == gameRelease.packageName }) ?? true,
               state.gameVersion == gameRelease.version,
               state.gameBaseSHA256 == gameRelease.baseSHA256,
               state.overlaySHA256 != nil else {
@@ -82,13 +83,13 @@ final class RuntimeController {
             "TFT_ROOT_SDK": paths.sdk.path,
             "TFT_ROOT_AVD_HOME": paths.avdHome.path,
             "TFT_AVD_HOME": paths.avdHome.path,
-            "TFT_AVD_NAME": "Tft",
+            "TFT_AVD_NAME": "TftPlay",
             "TFT_SERIAL": "emulator-5582",
             "TFT_EMULATOR_PORT": "5582",
             "TFT_ADB_SERVER_PORT": "5038",
             "ANDROID_ADB_SERVER_PORT": "5038",
             "ADB_MDNS_AUTO_CONNECT": "",
-            "TFT_LAUNCHER": paths.runtimeTemplate.appendingPathComponent("run-tft-angle-opengl.command").path,
+            "TFT_LAUNCHER": paths.runtimeTemplate.appendingPathComponent("run-tft-google-play.command").path,
             "TFT_GLTRANSPORT": "virtio-gpu-asg",
             "TFT_EXPECTED_GLTRANSPORT_BASELINE": "pipe",
             "TFT_AUDIO_ENABLED": "1",
@@ -96,6 +97,8 @@ final class RuntimeController {
             "TFT_DISPLAY_SIZE": profile.displaySize,
             "TFT_DISPLAY_DENSITY": "\(profile.density)",
             "TFT_GAME_LANGUAGE": language.id,
+            "TFT_PACKAGE": GameRelease.vietnamPackageName,
+            "TFT_FALLBACK_PACKAGE": GameRelease.globalPackageName,
             "TFT_CPU_CORES": "\(cpuCores)",
             "TFT_MEMORY_MB": "\(memoryMB)",
             "TFT_UI_SCALE": uiScale,

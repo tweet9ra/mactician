@@ -7,7 +7,7 @@ readonly ADB_SERVER_PORT="${TFT_ADB_SERVER_PORT:-5038}"
 ADB="$(tft_resolve_adb)"
 readonly ADB
 readonly SERIAL="${TFT_SERIAL:-emulator-5582}"
-readonly PACKAGE="com.riotgames.league.teamfighttactics"
+readonly PACKAGE="${TFT_PACKAGE:-com.riotgames.league.teamfighttactics}"
 
 if [[ "$ADB_SERVER_PORT" != <-> ]] \
         || (( ADB_SERVER_PORT < 1024 || ADB_SERVER_PORT > 65534 )); then

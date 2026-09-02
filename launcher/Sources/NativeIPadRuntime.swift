@@ -450,6 +450,9 @@ final class AndroidRuntimeControllerAdapter: GameRuntimeSessionControlling {
             return .unavailable("Invalid Android runtime configuration")
         }
         guard configuration.state.isReady,
+              configuration.state.gamePackageName.map({
+                  $0 == configuration.gameRelease.packageName
+              }) ?? true,
               configuration.state.gameVersion == configuration.gameRelease.version,
               configuration.state.gameBaseSHA256 == configuration.gameRelease.baseSHA256,
               configuration.state.overlaySHA256 != nil else {

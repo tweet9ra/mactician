@@ -7,6 +7,7 @@ readonly SIGN_UPDATE="$SPARKLE_ROOT/bin/sign_update"
 readonly APK_DIR="${MACTICIAN_GAME_APK_DIR:-${TFT_GAME_APK_DIR:-}}"
 readonly VERSION="${MACTICIAN_GAME_VERSION:-}"
 readonly VERSION_CODE="${MACTICIAN_GAME_VERSION_CODE:-}"
+readonly PACKAGE="${MACTICIAN_GAME_PACKAGE:-com.riotgames.league.teamfighttactics}"
 readonly SIGNING_ACCOUNT="${MACTICIAN_GAME_SIGNING_ACCOUNT:-mactician-game-updates}"
 readonly SIGNING_KEY_FILE="${MACTICIAN_GAME_SIGNING_KEY_FILE:-}"
 readonly UPDATE_BASE_URL="${MACTICIAN_UPDATE_BASE_URL:-https://sergeinaumov.dev/mactician/updates}"
@@ -36,6 +37,10 @@ done
 [[ -d "$APK_DIR" ]] || { print -u2 "MACTICIAN_GAME_APK_DIR must contain the official split APK files."; exit 2; }
 [[ -n "$VERSION" ]] || { print -u2 "MACTICIAN_GAME_VERSION is required."; exit 2; }
 [[ "$VERSION_CODE" == <1-> ]] || { print -u2 "MACTICIAN_GAME_VERSION_CODE must be a positive integer."; exit 2; }
+case "$PACKAGE" in
+    com.riotgames.league.teamfighttactics|com.riotgames.league.teamfighttacticsvn) ;;
+    *) print -u2 "MACTICIAN_GAME_PACKAGE must select the global or Vietnam TFT package."; exit 2 ;;
+esac
 [[ -n "$SIGNING_ACCOUNT" ]] || { print -u2 "MACTICIAN_GAME_SIGNING_ACCOUNT is required to sign the game feed."; exit 2; }
 command -v jq >/dev/null || { print -u2 "jq is required."; exit 1; }
 command -v openssl >/dev/null || { print -u2 "openssl is required."; exit 1; }
@@ -91,7 +96,7 @@ done
 
 jq -n \
     --arg publishedAt "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
-    --arg packageName "com.riotgames.league.teamfighttactics" \
+    --arg packageName "$PACKAGE" \
     --arg version "$VERSION" \
     --argjson versionCode "$VERSION_CODE" \
     --arg baseSHA256 "$BASE_SHA256" \

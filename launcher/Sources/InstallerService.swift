@@ -81,7 +81,10 @@ final class InstallerService {
 
     static func emulatorArguments(initializeData: Bool, logicalCPUCount: Int, memoryMB: Int) -> [String] {
         var arguments = [
-            "@Tft", "-id", "TFT-Tft", "-port", "5582", "-gpu", "host",
+            "@TftPlay", "-id", "TFT-TftPlay", "-port", "5582", "-gpu", "host",
+            "-feature", "GLESDynamicVersion,Vulkan,GuestAngle,-GLPipeChecksum,VulkanBatchedDescriptorSetUpdate,AsyncComposeSupport,VirtioGpuFenceContexts",
+            "-append-userspace-opt", "androidboot.opengles.version=196610",
+            "-append-userspace-opt", "androidboot.mactician.graphics_profile=osft",
             "-skin", "1920x1080", "-vsync-rate", "60",
             "-dns-server", "1.1.1.1,8.8.8.8",
             "-cores", "\(HostSizing.guestCPUCores(logicalCPUCount: logicalCPUCount))",
@@ -166,7 +169,11 @@ final class InstallerService {
                 )
                 let hosted = try fetchHostedGameFeed(progress: { _ in })
                 let release = hosted.feed.release
-                if let installedVersionCode = currentState.gameVersionCode,
+                let samePackage = currentState.gamePackageName.map {
+                    $0 == release.packageName
+                } ?? true
+                if samePackage,
+                   let installedVersionCode = currentState.gameVersionCode,
                    let remoteVersionCode = release.versionCode,
                    remoteVersionCode < installedVersionCode {
                     throw LauncherError.unsupportedGame(
@@ -297,6 +304,7 @@ final class InstallerService {
         progressOnMain(progress, .init(phase: .installingGame, message: "Installing TFT…", fraction: 0.94))
         try provisionGame(release: gameRelease, resources: gameResources)
         state.stage = .ready
+        state.gamePackageName = gameRelease.packageName
         state.gameVersion = gameRelease.version
         state.gameVersionCode = gameRelease.versionCode
         state.gameBaseSHA256 = gameRelease.baseSHA256
@@ -323,15 +331,21 @@ final class InstallerService {
         try Self.prepareDirectories(at: paths)
         let hosted = try fetchHostedGameFeed(progress: progress)
         let release = hosted.feed.release
-        if let installedVersionCode = currentState.gameVersionCode,
+        let samePackage = currentState.gamePackageName.map {
+            $0 == release.packageName
+        } ?? true
+        if samePackage,
+           let installedVersionCode = currentState.gameVersionCode,
            let remoteVersionCode = release.versionCode,
            remoteVersionCode < installedVersionCode {
             throw LauncherError.unsupportedGame("The hosted TFT release is older than the installed game")
         }
 
-        if currentState.gameVersion == release.version,
+        if samePackage,
+           currentState.gameVersion == release.version,
            currentState.gameBaseSHA256 == release.baseSHA256 {
             var state = currentState
+            state.gamePackageName = release.packageName
             state.gameVersionCode = release.versionCode
             try SystemServices.saveState(state, to: paths.stateFile)
             try saveHostedGameFeed(hosted.data)
@@ -363,6 +377,7 @@ final class InstallerService {
 
         var state = currentState
         state.stage = .ready
+        state.gamePackageName = release.packageName
         state.gameVersion = release.version
         state.gameVersionCode = release.versionCode
         state.gameBaseSHA256 = release.baseSHA256
@@ -655,6 +670,7 @@ final class InstallerService {
             return fileManager.fileExists(atPath: target.appendingPathComponent("system.img").path)
                 && fileManager.fileExists(atPath: target.appendingPathComponent("encryptionkey.img").path)
                 && sourceProperties(at: target).contains("Pkg.Revision=7")
+                && sourceProperties(at: target).contains("SystemImage.TagId=google_apis_playstore")
         default:
             return false
         }
@@ -780,7 +796,7 @@ final class InstallerService {
         defer { try? fileManager.removeItem(at: nextAVD) }
         try fileManager.createDirectory(at: nextAVD, withIntermediateDirectories: true)
         let config = """
-        AvdId=Tft
+        AvdId=TftPlay
         avd.ini.displayname=Mactician
         abi.type=arm64-v8a
         hw.cpu.arch=arm64
@@ -797,10 +813,10 @@ final class InstallerService {
         skin.name=1920x1080
         showDeviceFrame=no
         disk.dataPartition.size=12288M
-        image.sysdir.1=system-images/android-36/google_apis/arm64-v8a/
-        tag.id=google_apis
-        tag.display=Google APIs
-        PlayStore.enabled=false
+        image.sysdir.1=system-images/android-36/google_apis_playstore/arm64-v8a/
+        tag.id=google_apis_playstore
+        tag.display=Google Play
+        PlayStore.enabled=true
         fastboot.forceColdBoot=yes
         fastboot.forceFastBoot=no
         avd.ini.encoding=UTF-8
@@ -809,7 +825,7 @@ final class InstallerService {
         let ini = """
         avd.ini.encoding=UTF-8
         path=\(paths.avdDirectory.path)
-        path.rel=Tft.avd
+        path.rel=TftPlay.avd
         target=android-36
         """
         try SystemServices.run(paths.qemuImg, [
@@ -879,20 +895,6 @@ final class InstallerService {
             )
             return value?.trimmingCharacters(in: .whitespacesAndNewlines) == "1"
         }
-        _ = try SystemServices.run(
-            paths.adb,
-            Self.adbArguments(["-s", "emulator-5582", "root"]),
-            environment: environment
-        )
-        try waitFor(timeout: 30, description: "root adbd") {
-            let value = try? SystemServices.run(
-                self.paths.adb,
-                Self.adbArguments(["-s", "emulator-5582", "shell", "id", "-u"]),
-                environment: environment
-            )
-            return value?.trimmingCharacters(in: .whitespacesAndNewlines) == "0"
-        }
-
         let apkPaths = release.apks.map { resources.appendingPathComponent($0.name).path }
         _ = try SystemServices.run(
             paths.adb,

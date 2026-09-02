@@ -26,6 +26,8 @@ struct LauncherStateDeck: View {
                 LauncherLaunchingView(model: model)
             case .playing:
                 LauncherPlayingView(model: model)
+            case .deviceRunning:
+                LauncherAndroidRunningView(model: model)
             case .stopping:
                 LauncherStoppingView(model: model)
             case .failed:
@@ -716,7 +718,7 @@ private struct LauncherPlayingView: View {
                     )
                 )
                 Spacer()
-                Button(LauncherL10n.text("action.stop_game")) { model.stopGame() }
+                Button(LauncherL10n.text("action.stop_emulator")) { model.stopGame() }
                     .buttonStyle(LauncherSecondaryButtonStyle())
             }
             configurationSummary(configuration, full: true)
@@ -755,6 +757,33 @@ private struct LauncherPlayingView: View {
 
     private var hotkeysNeedAttention: Bool {
         model.hotkeyStatus == .permissionRequired || model.hotkeyStatus == .unavailable
+    }
+}
+
+private struct LauncherAndroidRunningView: View {
+    @ObservedObject var model: LauncherModel
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: LauncherTheme.Spacing.large) {
+            HStack(alignment: .top, spacing: LauncherTheme.Spacing.large) {
+                LauncherStatusHeader(
+                    symbol: "display",
+                    color: LauncherTheme.ColorToken.interactive,
+                    title: LauncherL10n.text("android_running.title"),
+                    description: LauncherL10n.text("android_running.description")
+                )
+                Spacer()
+                Button(LauncherL10n.text("action.stop_emulator")) { model.stopGame() }
+                    .buttonStyle(LauncherSecondaryButtonStyle())
+            }
+
+            Label(
+                LauncherL10n.text("android_running.install_hint"),
+                systemImage: "square.grid.2x2"
+            )
+            .font(.system(size: 12))
+            .foregroundColor(LauncherTheme.ColorToken.textSecondary)
+        }
     }
 }
 

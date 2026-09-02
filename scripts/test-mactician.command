@@ -24,7 +24,20 @@ cleanup() {
 }
 trap cleanup EXIT
 
-jq -e '.schemaVersion == 1 and (.components | length) == 3 and (.game.apks | length) == 4' \
+jq -e '
+    .schemaVersion == 1
+    and (.components | length) == 3
+    and (.game.apks | length) == 4
+    and (
+        .components[]
+        | select(.id == "system-image")
+        | .version == "android-36-google_apis_playstore-arm64-v8a-r07"
+            and .url == "https://dl.google.com/android/repository/sys-img/google_apis_playstore/arm64-v8a-36_r07.zip"
+            and .size == 1886527965
+            and .sha256 == "ddb0feff5c23db9f42ceabd28f6542e8ffec639abf818bf6831a2658e6cf7905"
+            and .installPath == "sdk/system-images/android-36/google_apis_playstore/arm64-v8a"
+    )
+' \
     "$LAUNCHER_DIR/Resources/release-manifest.json" >/dev/null
 plutil -lint "$LAUNCHER_DIR/Info.plist" >/dev/null
 plutil -lint "$LAUNCHER_DIR/Resources/EmulatorHost-Info.plist" >/dev/null
@@ -45,6 +58,7 @@ for syntax_script in \
         "$LAUNCHER_DIR/Resources/emulator-host.command" \
         "$PROJECT_DIR/run-tft-root-affinity.command" \
         "$PROJECT_DIR/run-tft-angle-opengl.command" \
+        "$PROJECT_DIR/run-tft-google-play.command" \
         "$PROJECT_DIR/scripts/run-asg-experiment.command" \
         "$PROJECT_DIR/scripts/run-autonomous-trial-benchmark.command" \
         "$PROJECT_DIR/scripts/capture-late-pvp-session.command" \
@@ -2397,6 +2411,7 @@ env \
     TFT_DISPLAY_SIZE=1920x1080 \
     TFT_DISPLAY_DENSITY=320 \
     TFT_GAME_LANGUAGE=en-US \
+    TFT_PACKAGE=com.riotgames.league.teamfighttactics \
     TFT_CPU_CORES=6 \
     TFT_MEMORY_MB=6144 \
     TFT_UI_SCALE=1.0 \
@@ -2435,7 +2450,8 @@ if (( LIFECYCLE_STATUS != 0 )) \
 fi
 
 # After TFT has started, three consecutive missing package-PID checks represent
-# a real game close. Verify that the runtime emits game_stopped before cleanup.
+# a real game close. Verify that the runtime emits game_stopped once and keeps
+# the Android session alive until an explicit stop request.
 readonly GAME_EXIT_ADB="$LIFECYCLE_ROOT/fake-adb.command"
 readonly GAME_EXIT_STATE="$LIFECYCLE_ROOT/fake-adb-state"
 cat >"$GAME_EXIT_ADB" <<'FAKE_ADB_EOF'
@@ -2473,6 +2489,8 @@ env \
     TFT_DISPLAY_SIZE=1920x1080 \
     TFT_DISPLAY_DENSITY=320 \
     TFT_GAME_LANGUAGE=en-US \
+    TFT_PACKAGE=com.riotgames.league.teamfighttacticsvn \
+    TFT_FALLBACK_PACKAGE=com.riotgames.league.teamfighttactics \
     TFT_CPU_CORES=6 \
     TFT_MEMORY_MB=6144 \
     TFT_UI_SCALE=1.0 \
@@ -2492,12 +2510,17 @@ for game_exit_attempt in {1..200}; do
     fi
     sleep 0.05
 done
+typeset game_exit_runtime_alive=0
+if (( game_exit_detected == 1 )) && kill -0 "$GAME_EXIT_PID" >/dev/null 2>&1; then
+    game_exit_runtime_alive=1
+fi
 kill -TERM "$GAME_EXIT_PID" >/dev/null 2>&1 || true
 wait "$GAME_EXIT_PID" || true
 if (( game_exit_detected == 0 )) \
+        || (( game_exit_runtime_alive == 0 )) \
         || [[ "$(grep -c '"event":"game_stopped"' "$LIFECYCLE_ROOT/game-exit-events.jsonl")" != 1 ]] \
         || grep -q '"event":"error"' "$LIFECYCLE_ROOT/game-exit-events.jsonl"; then
-    print -u2 "Launcher runtime did not classify a closed TFT process."
+    print -u2 "Launcher runtime did not preserve Android after TFT closed."
     cat "$LIFECYCLE_ROOT/game-exit-events.jsonl" >&2
     exit 1
 fi

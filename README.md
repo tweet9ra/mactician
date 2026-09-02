@@ -38,8 +38,8 @@ is configured independently.
 
 ## Features
 
-- Installs and verifies pinned Android Platform Tools, Emulator, and system
-  image archives.
+- Installs and verifies pinned Android Platform Tools, Emulator, and Google's
+  official Android 36 Google Play system image.
 - Verifies every downloaded component and bundled game split with SHA-256.
 - Creates, provisions, starts, stops, repairs, and resets a dedicated AVD.
 - Offers resolution, UI scale, Android RAM, vCPU, game-language, and three
@@ -69,6 +69,8 @@ is configured independently.
 - At least 25 GiB of free disk space for downloads, extraction, the AVD, TFT
   assets, and update headroom.
 - Internet access to Google's Android repository and TFT services.
+- A Google account is required to install or update applications through Play
+  Store.
 - Hypervisor Framework support, available on supported Apple Silicon Macs.
 - Acceptance of the linked Android SDK terms during installation.
 - Accessibility permission only if the built-in game hotkeys are used. The
@@ -94,7 +96,16 @@ and the SHA-256 published with that release before opening it.
    Gatekeeper can verify it normally without **Open Anyway**.
 3. Review and accept the Android SDK terms, then choose **Install**. About
    2.3 GB is downloaded before extraction and AVD provisioning.
-4. Enter Riot credentials manually inside the official TFT client.
+4. Open **Google Play** in the Android window and sign in.
+5. For the Vietnam client, install **Đấu Trường Chân Lý** from its
+   [official Google Play listing](https://play.google.com/store/apps/details?id=com.riotgames.league.teamfighttacticsvn).
+   Its package ID is `com.riotgames.league.teamfighttacticsvn`.
+6. Open the installed game from Android. Mactician detects the Vietnam client
+   first and uses the global TFT client as a fallback.
+
+Applications, Play Store account data, and Android settings persist until
+**Reset** is used. Closing TFT leaves Android running so another installed
+application can be opened without rebooting the emulator.
 
 Mactician-managed data stays in
 `$HOME/Library/Application Support/Mactician`.

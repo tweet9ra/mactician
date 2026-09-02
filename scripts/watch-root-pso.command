@@ -7,7 +7,7 @@ readonly ADB_SERVER_PORT="${TFT_ADB_SERVER_PORT:-5038}"
 ADB="$(tft_resolve_adb)"
 readonly ADB
 readonly SERIAL="${TFT_SERIAL:-emulator-5582}"
-readonly PACKAGE="com.riotgames.league.teamfighttactics"
+readonly PACKAGE="${TFT_PACKAGE:-com.riotgames.league.teamfighttactics}"
 readonly WATCH_INTERVAL="${TFT_PSO_WATCH_INTERVAL:-10}"
 readonly PSO_CPU_LIST="${TFT_PSO_CPU_LIST:-0-6}"
 
@@ -59,10 +59,10 @@ while "$ADB" -s "$SERIAL" get-state >/dev/null 2>&1; do
         pso_cpu_mask='"$PSO_CPU_MASK"'
         pso_changed=0
         for pso_pid in $(pidof \
-            com.riotgames.league.teamfighttactics:psoprogramservice \
-            com.riotgames.league.teamfighttactics:psoprogramservice1 \
-            com.riotgames.league.teamfighttactics:psoprogramservice2 \
-            com.riotgames.league.teamfighttactics:psoprogramservice3); do
+            "${PACKAGE}:psoprogramservice" \
+            "${PACKAGE}:psoprogramservice1" \
+            "${PACKAGE}:psoprogramservice2" \
+            "${PACKAGE}:psoprogramservice3"); do
             [ -d "/proc/$pso_pid/task" ] || continue
             for pso_task in /proc/$pso_pid/task/*; do
                 [ -r "$pso_task/status" ] || continue

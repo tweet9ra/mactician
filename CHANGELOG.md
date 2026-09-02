@@ -6,6 +6,13 @@ The current application metadata is version 1.1.3, build 48.
 
 ### Changed
 
+- Use Google's official Android 36 Google Play image for the managed emulator,
+  keep Play Store applications and account data persistent, and launch the
+  Vietnam TFT client when it is installed without requiring root-only overlays.
+- Keep the managed Android device open when TFT closes so other installed apps
+  remain available until the user explicitly stops the emulator.
+- Support signed game releases for the official Vietnam TFT package while
+  preserving the existing global package and rejecting unknown package IDs.
 - Add an approximate DAU metric backed by at most one unlinkable
   `daily_active` event per retained preferences domain and UTC day. The event
   contains no stable identifier, and the server does not retain its source IP.

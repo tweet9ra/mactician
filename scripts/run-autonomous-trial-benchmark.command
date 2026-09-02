@@ -12,7 +12,7 @@ readonly ADB_SERVER_PORT="${TFT_ADB_SERVER_PORT:-5038}"
 ADB="$(tft_resolve_adb)"
 readonly ADB
 readonly SERIAL="${TFT_SERIAL:-emulator-5582}"
-readonly PACKAGE="com.riotgames.league.teamfighttactics"
+readonly PACKAGE="${TFT_PACKAGE:-com.riotgames.league.teamfighttactics}"
 readonly GAME_ACTIVITY="$PACKAGE/com.epicgames.unreal.GameActivity"
 readonly CLASSIFIER="${TFT_SCREEN_CLASSIFIER_BINARY:-$PROJECT_DIR/runtime/tft-screen-classifier}"
 readonly CLASSIFIER_SOURCE="$PROJECT_DIR/tools/tft-screen-classifier.swift"
@@ -1367,7 +1367,7 @@ while (( SECONDS - navigation_started < NAVIGATION_TIMEOUT )); do
                         | tr -d '\r' \
                         | grep -m 1 'topResumedActivity=' || true
                 )"
-                if [[ "$top_activity" == *com.riotgames.league.teamfighttactics* \
+                if [[ "$top_activity" == *"$PACKAGE"* \
                         && "$top_activity" != *MobileFREWebViewActivity* \
                         && "$CURRENT_EVIDENCE" == *"SIGN IN"* ]]; then
                     # At higher physical resolutions OCR may miss the logo and

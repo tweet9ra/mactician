@@ -4,7 +4,7 @@ unsetopt BG_NICE
 
 readonly REQUIRED_ENV=(
     TFT_RUNTIME_PROJECT TFT_LAUNCH_LOG TFT_ADB TFT_AVD_HOME TFT_AVD_NAME
-    TFT_SERIAL TFT_DISPLAY_SIZE TFT_DISPLAY_DENSITY TFT_GAME_LANGUAGE
+    TFT_SERIAL TFT_DISPLAY_SIZE TFT_DISPLAY_DENSITY TFT_GAME_LANGUAGE TFT_PACKAGE
     TFT_CPU_CORES TFT_MEMORY_MB TFT_UI_SCALE TFT_PERFORMANCE_MODE
 )
 for required_name in "${REQUIRED_ENV[@]}"; do
@@ -13,6 +13,23 @@ for required_name in "${REQUIRED_ENV[@]}"; do
         exit 2
     fi
 done
+
+case "$TFT_PACKAGE" in
+    com.riotgames.league.teamfighttactics|com.riotgames.league.teamfighttacticsvn) ;;
+    *)
+        print -r -- '{"event":"error","message":"Unsupported TFT package","code":2}'
+        exit 2
+        ;;
+esac
+if [[ -n "${TFT_FALLBACK_PACKAGE:-}" ]]; then
+    case "$TFT_FALLBACK_PACKAGE" in
+        com.riotgames.league.teamfighttactics|com.riotgames.league.teamfighttacticsvn) ;;
+        *)
+            print -r -- '{"event":"error","message":"Unsupported fallback TFT package","code":2}'
+            exit 2
+            ;;
+    esac
+fi
 
 case "$TFT_GAME_LANGUAGE" in
     en-US|ru-RU|de-DE|fr-FR|es-ES|es-MX|pt-BR|it-IT|pl-PL|cs-CZ|hu-HU|ro-RO|el-GR|tr-TR|ar-AE|ja-JP|ko-KR|zh-CN|zh-SG|zh-TW|vi-VN|th-TH|id-ID)
@@ -43,9 +60,25 @@ emit '{"event":"booting","message":"Starting Android…"}'
 "$TFT_RUNTIME_PROJECT/scripts/run-asg-experiment.command" >>"$TFT_LAUNCH_LOG" 2>&1 &
 child_pid=$!
 
+running_game_package() {
+    typeset package_name
+    typeset package_pid
+    for package_name in "$TFT_PACKAGE" "${TFT_FALLBACK_PACKAGE:-}"; do
+        [[ -n "$package_name" ]] || continue
+        package_pid="$("$TFT_ADB" -s "$TFT_SERIAL" shell pidof "$package_name" 2>/dev/null | tr -d '\r')"
+        if [[ -n "$package_pid" ]]; then
+            print -r -- "$package_name"
+            return 0
+        fi
+    done
+    return 1
+}
+
 typeset emulator_pid=""
 typeset emitted_pid=0
 typeset emitted_ready=0
+typeset emitted_device_ready=0
+typeset game_started_once=0
 typeset locale_applied=0
 typeset missing_game_checks=0
 while kill -0 "$child_pid" >/dev/null 2>&1; do
@@ -62,25 +95,39 @@ while kill -0 "$child_pid" >/dev/null 2>&1; do
     if (( locale_applied == 0 )) \
             && "$TFT_ADB" -s "$TFT_SERIAL" get-state >/dev/null 2>&1 \
             && [[ "$("$TFT_ADB" -s "$TFT_SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == "1" ]]; then
-        "$TFT_ADB" -s "$TFT_SERIAL" shell cmd locale set-app-locales \
-            com.riotgames.league.teamfighttactics "$TFT_GAME_LANGUAGE" \
-            >>"$TFT_LAUNCH_LOG" 2>&1 || true
+        typeset locale_package
+        for locale_package in "$TFT_PACKAGE" "${TFT_FALLBACK_PACKAGE:-}"; do
+            [[ -n "$locale_package" ]] || continue
+            "$TFT_ADB" -s "$TFT_SERIAL" shell cmd locale set-app-locales \
+                "$locale_package" "$TFT_GAME_LANGUAGE" \
+                >>"$TFT_LAUNCH_LOG" 2>&1 || true
+        done
         locale_applied=1
+    fi
+    typeset current_game_package=""
+    current_game_package="$(running_game_package || true)"
+    if (( locale_applied == 1 && emitted_device_ready == 0 && emitted_ready == 0 )) \
+            && [[ -z "$current_game_package" ]]; then
+        emit "{\"event\":\"device_ready\",\"message\":\"Android is ready\",\"serial\":\"$TFT_SERIAL\"}"
+        emitted_device_ready=1
     fi
     if (( emitted_ready == 0 )) \
             && "$TFT_ADB" -s "$TFT_SERIAL" get-state >/dev/null 2>&1 \
-            && [[ -n "$("$TFT_ADB" -s "$TFT_SERIAL" shell pidof com.riotgames.league.teamfighttactics 2>/dev/null | tr -d '\r')" ]]; then
-        emit "{\"event\":\"ready\",\"message\":\"TFT is open\",\"serial\":\"$TFT_SERIAL\"}"
+            && [[ -n "$current_game_package" ]]; then
+        emit "{\"event\":\"ready\",\"message\":\"TFT is open\",\"serial\":\"$TFT_SERIAL\",\"package\":\"$current_game_package\"}"
         emitted_ready=1
+        emitted_device_ready=1
+        game_started_once=1
     fi
     if (( emitted_ready == 1 )); then
-        if [[ -n "$("$TFT_ADB" -s "$TFT_SERIAL" shell pidof com.riotgames.league.teamfighttactics 2>/dev/null | tr -d '\r')" ]]; then
+        if [[ -n "$current_game_package" ]]; then
             missing_game_checks=0
         else
             (( missing_game_checks += 1 ))
             if (( missing_game_checks >= 3 )); then
                 emit "{\"event\":\"game_stopped\",\"message\":\"TFT closed\",\"serial\":\"$TFT_SERIAL\"}"
-                break
+                emitted_ready=0
+                missing_game_checks=0
             fi
         fi
     fi
@@ -90,7 +137,7 @@ done
 wait "$child_pid"
 readonly child_status=$?
 typeset normal_stop=0
-if (( stop_requested == 1 || emitted_ready == 1 )); then
+if (( stop_requested == 1 || game_started_once == 1 )); then
     normal_stop=1
 fi
 if (( child_status == 42 && stop_requested == 0 )); then

@@ -7,7 +7,7 @@ readonly ADB_SERVER_PORT="${TFT_ADB_SERVER_PORT:-5038}"
 ADB="$(tft_resolve_adb)"
 readonly ADB
 readonly SERIAL="${TFT_SERIAL:-emulator-5582}"
-readonly PACKAGE="com.riotgames.league.teamfighttactics"
+readonly PACKAGE="${TFT_PACKAGE:-com.riotgames.league.teamfighttactics}"
 readonly GAME_ACTIVITY="$PACKAGE/com.epicgames.unreal.GameActivity"
 readonly INPUT_DEVICE="${TFT_INPUT_EVENT_DEVICE:-/dev/input/event1}"
 readonly ROUNDS="${TFT_INPUT_LATENCY_ROUNDS:-3}"

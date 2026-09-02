@@ -21,7 +21,7 @@ readonly ADB
 readonly AVD_HOME="$(tft_resolve_avd_home)"
 readonly AVD_NAME="${TFT_AVD_NAME:-Tft}"
 readonly SERIAL="emulator-5572"
-readonly PACKAGE="com.riotgames.league.teamfighttactics"
+readonly PACKAGE="${TFT_PACKAGE:-com.riotgames.league.teamfighttactics}"
 readonly ACTIVITY="com.epicgames.unreal.SplashActivity"
 readonly ANGLE_FEATURES="exposeNonConformantExtensionsAndVersions:exposeES32ForTesting"
 # 1600x900 is the balanced fallback: it gives TFT 56% more source pixels than

@@ -52,6 +52,34 @@ enum LauncherTests {
             publicKeyBase64: hostedPrivateKey.publicKey.rawRepresentation.base64EncodedString()
         )
         try expect(verifiedHostedFeed.release == hostedRelease, "signed hosted game feed")
+        let vietnamRelease = GameRelease(
+            packageName: GameRelease.vietnamPackageName,
+            version: hostedRelease.version,
+            versionCode: hostedRelease.versionCode,
+            baseSHA256: hostedRelease.baseSHA256,
+            apks: hostedRelease.apks
+        )
+        try vietnamRelease.validate()
+        try expect(
+            GameRelease.supportedPackageNames == Set([
+                GameRelease.globalPackageName,
+                GameRelease.vietnamPackageName
+            ]),
+            "global and Vietnam TFT package validation"
+        )
+        let unknownPackageRelease = GameRelease(
+            packageName: "com.example.teamfighttactics",
+            version: hostedRelease.version,
+            versionCode: hostedRelease.versionCode,
+            baseSHA256: hostedRelease.baseSHA256,
+            apks: hostedRelease.apks
+        )
+        do {
+            try unknownPackageRelease.validate()
+            throw TestFailure("unknown TFT package accepted")
+        } catch is LauncherError {
+            // Expected.
+        }
         var olderInstallState = InstallState()
         olderInstallState.gameVersion = "18.1-old"
         olderInstallState.gameVersionCode = 8_210_000
@@ -60,11 +88,16 @@ enum LauncherTests {
             "newer hosted game version detection"
         )
         var currentInstallState = olderInstallState
+        currentInstallState.gamePackageName = hostedRelease.packageName
         currentInstallState.gameVersion = hostedRelease.version
         currentInstallState.gameVersionCode = hostedRelease.versionCode
         try expect(
             !HostedGameUpdate.isNewer(hostedRelease, than: currentInstallState),
             "current hosted game version detection"
+        )
+        try expect(
+            HostedGameUpdate.isNewer(vietnamRelease, than: currentInstallState),
+            "Vietnam package switch is detected even at the same version"
         )
         var newerInstallState = currentInstallState
         newerInstallState.gameVersionCode = 8_230_000
@@ -756,6 +789,25 @@ enum LauncherTests {
             gameStoppedEvent.event == .gameStopped,
             "runtime game-closed event decoding"
         )
+        let deviceReadyEvent = try JSONDecoder().decode(
+            RuntimeEvent.self,
+            from: Data(#"{"event":"device_ready","serial":"emulator-5582"}"#.utf8)
+        )
+        try expect(
+            deviceReadyEvent.event == .deviceReady
+                && deviceReadyEvent.serial == "emulator-5582",
+            "Google Play device-ready event decoding"
+        )
+        let vietnamReadyEvent = try JSONDecoder().decode(
+            RuntimeEvent.self,
+            from: Data(
+                #"{"event":"ready","package":"com.riotgames.league.teamfighttacticsvn"}"#.utf8
+            )
+        )
+        try expect(
+            vietnamReadyEvent.package == GameRelease.vietnamPackageName,
+            "Vietnam runtime package event decoding"
+        )
         let gameActivityOutput = """
             Display #0:
               topResumedActivity=ActivityRecord{abc123 u0 com.riotgames.league.teamfighttactics/com.epicgames.unreal.GameActivity t42}
@@ -1198,6 +1250,12 @@ enum LauncherTests {
             "public DNS avoids local network access"
         )
         try expect(
+            provisioningArguments.contains("GLESDynamicVersion,Vulkan,GuestAngle,-GLPipeChecksum,VulkanBatchedDescriptorSetUpdate,AsyncComposeSupport,VirtioGpuFenceContexts")
+                && provisioningArguments.contains("androidboot.opengles.version=196610")
+                && provisioningArguments.contains("androidboot.mactician.graphics_profile=osft"),
+            "Google Play provisioning exposes TFT's required OpenGL ES 3.2 profile"
+        )
+        try expect(
             provisioningArguments.joined(separator: " ").contains("-memory 4096"),
             "low-memory provisioning"
         )
@@ -1257,11 +1315,16 @@ enum LauncherTests {
         var state = InstallState()
         state.stage = .avdCreated
         state.installedComponents = ["emulator": "37.1.11"]
+        state.gamePackageName = GameRelease.vietnamPackageName
         let stateURL = temporary.appendingPathComponent("install-state.json")
         try SystemServices.saveState(state, to: stateURL)
         let restored = SystemServices.loadState(from: stateURL)
         try expect(restored.stage == .avdCreated, "state stage")
         try expect(restored.installedComponents == state.installedComponents, "state components")
+        try expect(
+            restored.gamePackageName == GameRelease.vietnamPackageName,
+            "Vietnam package state persistence"
+        )
         try Data("truncated".utf8).write(to: stateURL, options: .atomic)
         try expect(SystemServices.loadState(from: stateURL).stage == .empty, "corrupt state fallback")
 
@@ -1319,6 +1382,17 @@ enum LauncherTests {
         let rootRuntimeScript = try String(
             contentsOf: sourceRoot.deletingLastPathComponent().appendingPathComponent("run-tft-root-affinity.command"),
             encoding: .utf8
+        )
+        let googlePlayRuntimeScript = try String(
+            contentsOf: sourceRoot.deletingLastPathComponent().appendingPathComponent("run-tft-google-play.command"),
+            encoding: .utf8
+        )
+        try expect(
+            googlePlayRuntimeScript.contains("androidboot.opengles.version=$OPENGL_ES_VERSION")
+                && googlePlayRuntimeScript.contains("feature:reqGlEsVersion=0x30002")
+                && googlePlayRuntimeScript.contains("angle_gl_driver_selection_pkgs")
+                && googlePlayRuntimeScript.contains("exposeES32ForTesting"),
+            "Google Play runtime preserves TFT's OpenGL ES 3.2 catalog and ANGLE requirements"
         )
         try expect(
             rootRuntimeScript.contains("Empty TFT streaming manifest detected")

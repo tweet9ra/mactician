@@ -37,6 +37,10 @@ struct HostedGameFeed: Codable, Equatable {
 
 enum HostedGameUpdate {
     static func isNewer(_ release: GameRelease, than state: InstallState) -> Bool {
+        if let installedPackage = state.gamePackageName,
+           installedPackage != release.packageName {
+            return true
+        }
         if let remoteVersionCode = release.versionCode,
            let installedVersionCode = state.gameVersionCode {
             return remoteVersionCode > installedVersionCode

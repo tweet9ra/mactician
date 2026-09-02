@@ -38,10 +38,15 @@ struct LauncherPaths {
     var qemuSystem: URL { sdk.appendingPathComponent("emulator/qemu/darwin-aarch64/qemu-system-aarch64") }
     var qemuImg: URL { sdk.appendingPathComponent("emulator/qemu-img") }
     var adb: URL { sdk.appendingPathComponent("platform-tools/adb") }
-    var systemImage: URL { sdk.appendingPathComponent("system-images/android-36/google_apis/arm64-v8a", isDirectory: true) }
+    var systemImage: URL {
+        sdk.appendingPathComponent(
+            "system-images/android-36/google_apis_playstore/arm64-v8a",
+            isDirectory: true
+        )
+    }
     var avdHome: URL { root.appendingPathComponent("avd", isDirectory: true) }
-    var avdDirectory: URL { avdHome.appendingPathComponent("Tft.avd", isDirectory: true) }
-    var avdINI: URL { avdHome.appendingPathComponent("Tft.ini") }
+    var avdDirectory: URL { avdHome.appendingPathComponent("TftPlay.avd", isDirectory: true) }
+    var avdINI: URL { avdHome.appendingPathComponent("TftPlay.ini") }
     var avdBootCompleted: URL { avdDirectory.appendingPathComponent("bootcompleted.ini") }
     var runtimeProject: URL { root.appendingPathComponent("runtime-project", isDirectory: true) }
     var downloads: URL { root.appendingPathComponent("downloads", isDirectory: true) }

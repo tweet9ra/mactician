@@ -81,6 +81,10 @@ struct SDKComponent: Codable, Equatable, Identifiable {
 }
 
 struct GameRelease: Codable, Equatable {
+    static let globalPackageName = "com.riotgames.league.teamfighttactics"
+    static let vietnamPackageName = "com.riotgames.league.teamfighttacticsvn"
+    static let supportedPackageNames = Set([globalPackageName, vietnamPackageName])
+
     let packageName: String
     let version: String
     let versionCode: Int?
@@ -88,7 +92,7 @@ struct GameRelease: Codable, Equatable {
     let apks: [GameAPK]
 
     func validate() throws {
-        guard packageName == "com.riotgames.league.teamfighttactics",
+        guard Self.supportedPackageNames.contains(packageName),
               !version.isEmpty,
               baseSHA256.isLowercaseSHA256,
               (1 ... 32).contains(apks.count),
@@ -226,6 +230,7 @@ struct InstallState: Codable, Equatable {
     var schemaVersion: Int = 1
     var stage: Stage = .empty
     var installedComponents: [String: String] = [:]
+    var gamePackageName: String?
     var gameVersion: String?
     var gameVersionCode: Int?
     var gameBaseSHA256: String?
@@ -241,6 +246,7 @@ struct RuntimeEvent: Codable, Equatable {
         case booting
         case installingGame = "installing_game"
         case emulatorStarted = "emulator_started"
+        case deviceReady = "device_ready"
         case ready
         case gameStopped = "game_stopped"
         case stopped
@@ -251,6 +257,7 @@ struct RuntimeEvent: Codable, Equatable {
     var message: String?
     var pid: Int32?
     var serial: String?
+    var package: String?
     var code: Int32?
 }
 

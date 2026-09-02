@@ -16,8 +16,8 @@ Do not casually change:
 - Sparkle feed `https://sergeinaumov.dev/mactician/updates/appcast.xml`;
 - pinned Sparkle Ed25519 public key in `launcher/Info.plist`;
 - UserDefaults domain and Keychain service `dev.sergeinaumov.mactician`;
-- Android package ID, release-manifest hashes, or the `Android_Codex` device
-  profile identifier.
+- supported Android package IDs, release-manifest hashes, or the
+  `Android_Codex` device profile identifier.
 
 These are the only current product identifiers. No old feed, local-data path,
 redirect, alias, or compatibility wrapper is part of the release.
@@ -104,6 +104,11 @@ Review the generated payload and APK hashes. To publish, set
 `MACTICIAN_UPDATE_SSH_TARGET` and `MACTICIAN_UPDATE_REMOTE_ROOT`, then rerun
 without `--prepare-only`. `MACTICIAN_GAME_SIGNING_ACCOUNT` defaults to the
 dedicated `mactician-game-updates` Keychain account.
+
+The publisher defaults to the global TFT package. Set
+`MACTICIAN_GAME_PACKAGE=com.riotgames.league.teamfighttacticsvn` when preparing
+an official Vietnam release. Only the global and Vietnam package identifiers
+are accepted.
 
 The publisher uploads immutable APK files before atomically replacing the
 signed `game/manifest.json`. Never publish an incomplete split set, reuse a

@@ -10,6 +10,7 @@ final class LauncherModel: ObservableObject {
         case ready
         case launching
         case playing
+        case deviceRunning
         case stopping
         case failed
     }
@@ -76,9 +77,17 @@ final class LauncherModel: ObservableObject {
             let manifest = try SystemServices.loadManifest(from: paths.manifest)
             self.paths = paths
             self.manifest = manifest
-            installState = SystemServices.loadState(from: paths.stateFile)
-            gameRelease = (try? HostedGameUpdate.loadVerifiedFeed(from: paths.hostedGameFeed).release)
+            var restoredState = SystemServices.loadState(from: paths.stateFile)
+            let restoredRelease = (try? HostedGameUpdate.loadVerifiedFeed(from: paths.hostedGameFeed).release)
                 ?? manifest.game
+            if restoredState.gamePackageName == nil,
+               restoredState.gameVersion == restoredRelease.version,
+               restoredState.gameBaseSHA256 == restoredRelease.baseSHA256 {
+                restoredState.gamePackageName = restoredRelease.packageName
+                try? SystemServices.saveState(restoredState, to: paths.stateFile)
+            }
+            installState = restoredState
+            gameRelease = restoredRelease
             installer = InstallerService(paths: paths, manifest: manifest)
             androidRuntime = AndroidRuntimeControllerAdapter(runtime: RuntimeController(paths: paths))
             let nativeValidator = NativeIPadRuntimeValidator()
@@ -227,7 +236,7 @@ final class LauncherModel: ObservableObject {
     }
 
     var settingsLocked: Bool {
-        mode == .launching || mode == .playing || mode == .stopping
+        mode == .launching || mode == .playing || mode == .deviceRunning || mode == .stopping
     }
 
     var maintenanceLocked: Bool {
@@ -548,7 +557,7 @@ final class LauncherModel: ObservableObject {
     }
 
     func stopGame() {
-        guard mode == .launching || mode == .playing else { return }
+        guard mode == .launching || mode == .playing || mode == .deviceRunning else { return }
         stopRequested = true
         mode = .stopping
         status = activeRuntimeKind == .nativeIPadExperimental
@@ -771,6 +780,10 @@ final class LauncherModel: ObservableObject {
             status = event.message ?? "Booting Android…"
         case .emulatorStarted:
             emulatorPID = event.pid
+        case .deviceReady:
+            mode = .deviceRunning
+            status = LauncherL10n.text("android_running.title")
+            detail = LauncherL10n.text("android_running.description")
         case .ready:
             mode = .playing
             gameSessionTracker.start()
@@ -778,17 +791,21 @@ final class LauncherModel: ObservableObject {
                 status = LauncherL10n.text("native_ipad.running.title")
                 detail = LauncherL10n.text("native_ipad.running.description")
             } else {
+                let activePackage = event.package ?? gameRelease.packageName
                 status = "TFT is open"
                 detail = "Space — shop  •  D — reroll  •  F — XP  •  Tab — items/traits  •  V — players/damage  •  Control + Fn + F — fill window."
-                loginAnimationRepair.start(adb: paths.adb, log: paths.launcherLog)
+                loginAnimationRepair.start(
+                    adb: paths.adb,
+                    package: activePackage,
+                    log: paths.launcherLog
+                )
                 if let emulatorPID {
                     let profile = launchProfile ?? selectedProfile
-                    audioRecovery.start(
+                    fpsOverlay.start(
                         targetPID: emulatorPID,
                         adb: paths.adb,
-                        log: paths.launcherLog
+                        package: activePackage
                     )
-                    fpsOverlay.start(targetPID: emulatorPID, adb: paths.adb)
                     inputBridge.start(
                         targetPID: emulatorPID,
                         adb: paths.adb,
@@ -815,7 +832,13 @@ final class LauncherModel: ObservableObject {
             fail(errorMessage, origin: .runtime)
         case .gameStopped:
             finishGameSession(showAnnouncement: activeRuntimeKind == .androidEmulator)
-            stopGame()
+            loginAnimationRepair.stop()
+            audioRecovery.stop()
+            fpsOverlay.stop()
+            inputBridge.stop()
+            mode = .deviceRunning
+            status = LauncherL10n.text("android_running.title")
+            detail = LauncherL10n.text("android_running.description")
         case .stopped:
             let stoppedRuntime = activeRuntimeKind
             loginAnimationRepair.stop()
@@ -977,6 +1000,7 @@ final class LauncherModel: ObservableObject {
         gameRelease: GameRelease
     ) -> Bool {
         state.isReady
+            && (state.gamePackageName.map { $0 == gameRelease.packageName } ?? true)
             && state.gameVersion == gameRelease.version
             && state.gameBaseSHA256 == gameRelease.baseSHA256
             && state.overlaySHA256 != nil
