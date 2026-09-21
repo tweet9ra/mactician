@@ -156,3 +156,19 @@ read outcomes and timing counts are sent. Raw log text, identifiers, tokens and
 event timestamps are never saved or uploaded. These shadow observations do not
 change frame labels or assert the current stage/phase. They are standard
 performance collection, with the same queue, retention and cohort suppression.
+
+## Log context (2026-09-21 implementation)
+
+New diagnostics v3 replace performance screenshots/OCR with two bounded log
+reads around the frame window. They classify recent lobby, matchmaking,
+match-starting or match activity; they do not infer current combat/planning or
+numeric rounds from GC departures. Recent activity has descriptive frame
+statistics and separate coverage counts, without gameplay eligibility. Historical
+screenshot clients keep their original labels and classifier identity.
+
+See [implementation and validation status](game-log-context.md). Swift tests and
+typecheck, shared contracts, API tests/vet and the website lint/typecheck/build
+pass. The report was visually checked with synthetic data. Live-match accuracy
+and collection impact have not yet been verified; API compatibility must precede
+launcher distribution. The owner-reported game-update delay and hosting outage
+confound the earlier field snapshot and must not be treated as client regressions.

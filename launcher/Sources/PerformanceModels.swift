@@ -51,7 +51,7 @@ struct PerformanceSnapshot: Codable, Equatable {
     var elapsedMS: Int64 = 0
     var readyMS: Int64?
     let collector = "sf-timestats-sampled-v1"
-    let classifier = "screen-bracket-v1"
+    var classifier = "game-log-bracket-v1"
     var runtime: PerformanceRuntime
     var windowsAttempted: Int64 = 0
     var windowsMissing: Int64 = 0
@@ -142,6 +142,7 @@ struct PerformanceSample {
     var contextReason: String?
     var timings: [String: [Int64]] = [:]
     var backoff = false
+    var logBefore = GameLogObservation(outcome: "read_failed")
     var gameLog = GameLogObservation(outcome: "read_failed")
 
     mutating func observe(_ key: String, since began: TimeInterval) {

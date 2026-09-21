@@ -875,9 +875,7 @@ final class LauncherModel: ObservableObject {
                     stopPerformanceCollector()
                     let generation = performanceGeneration
                     let collector = PerformanceCollector(adb: paths.adb,
-                        classifier: paths.performanceClassifier,
-                        package: selectedEdition.packageName, targetPID: emulatorPID,
-                        expectedDimensions: profile.displaySize) { [weak self] sample in
+                        package: selectedEdition.packageName, targetPID: emulatorPID) { [weak self] sample in
                         DispatchQueue.main.async {
                             guard let self, self.performanceGeneration == generation else { return }
                             self.telemetry.recordPerformanceSample(sample)

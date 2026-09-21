@@ -11,7 +11,7 @@ readonly API_CONTRACT_DIR="${MACTICIAN_API_CONTRACT_DIR:-$PROJECT_DIR/../sergein
 )
 
 if [[ -d "$API_CONTRACT_DIR" ]]; then
-    for fixture in activation-snapshot-v2.json daily-active-v2.json first-game-session-v2.json game-session-diagnostics-v2.json game-session-summary-v2.json game-session-performance-v2.json game-session-performance-diagnostics-v2.json game-session-performance-game-log-v2.json SHA256SUMS; do
+    for fixture in activation-snapshot-v2.json daily-active-v2.json first-game-session-v2.json game-session-diagnostics-v2.json game-session-summary-v2.json game-session-performance-v2.json game-session-performance-diagnostics-v2.json game-session-performance-game-log-v2.json game-session-performance-log-context-v2.json SHA256SUMS; do
         cmp -s "$CONTRACT_DIR/$fixture" "$API_CONTRACT_DIR/$fixture" || {
             print -u2 "Telemetry contract drift: $fixture differs from $API_CONTRACT_DIR/$fixture"
             exit 1

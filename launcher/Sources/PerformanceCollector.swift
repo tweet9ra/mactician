@@ -2,28 +2,25 @@ import AppKit
 import Darwin
 import Foundation
 
-// Uniformly scheduled short samples keep OCR and ADB work off the frame path.
-// Screenshots only cross pipes in memory. No images, OCR text, layers or PIDs
-// enter the telemetry payload. Scene labels describe matching sample endpoints.
+// Short foreground samples bracket frame measurements with bounded passive log reads.
+// Recent lifecycle/activity is not a current combat phase or numeric round.
+// Raw logs, timestamps, file identity and PIDs never enter telemetry.
 final class PerformanceCollector {
     private let queue = DispatchQueue(label: "dev.sergeinaumov.mactician.performance", qos: .utility)
     private let lock = NSLock()
     private let adb: URL
-    private let classifier: URL
     private let package: String
     private let targetPID: pid_t
-    private let expectedDimensions: String
     private var lastSampleAt: TimeInterval?
-    private var lastRunFailure = "helper_failed"
     private let publish: (PerformanceSample) -> Void
     private var stopped = false
     private var process: Process?
     private var enabledTimeStats = false
     private var exposure = "unknown"
 
-    init(adb: URL, classifier: URL, package: String, targetPID: pid_t, expectedDimensions: String, publish: @escaping (PerformanceSample) -> Void) {
-        self.adb = adb; self.classifier = classifier; self.package = package
-        self.targetPID = targetPID; self.expectedDimensions = expectedDimensions; self.publish = publish
+    init(adb: URL, package: String, targetPID: pid_t, publish: @escaping (PerformanceSample) -> Void) {
+        self.adb = adb; self.package = package
+        self.targetPID = targetPID; self.publish = publish
     }
 
     func start() {
@@ -63,7 +60,7 @@ final class PerformanceCollector {
             }
             if exposure == "unknown" { exposure = cacheExposure() }
             result.cacheState = exposure
-            let beforeScene = scene(sample: &result)
+            result.logBefore = logContext(sample: &result)
             // Cleanup is required even if the guest enabled TimeStats but its response was lost.
             enabledTimeStats = true
             result.missingReason = "timestats_failed"
@@ -75,7 +72,6 @@ final class PerformanceCollector {
                 if let before = timeStats(sample: &result), !isStopped {
                     if foreground() {
                         let measuredAt = ProcessInfo.processInfo.systemUptime
-                        if let captured = beforeScene.capturedAt { result.observe("before_gap", since: captured) }
                         var focused = true
                         for _ in 0..<20 {
                             if isStopped { break }
@@ -85,18 +81,12 @@ final class PerformanceCollector {
                         if !isStopped, let after = timeStats(sample: &result) {
                             let measuredUntil = ProcessInfo.processInfo.systemUptime
                             result.durationMS = Int64((measuredUntil - measuredAt) * 1000)
-                            let afterScene = scene(sample: &result)
-                            if let captured = afterScene.capturedAt {
-                                PerformanceDiagnostics.observe("after_gap", milliseconds: Int64((captured - measuredUntil) * 1000), in: &result.timings)
-                            }
                             if focused, foreground() {
                                 result.histogram = SurfaceFlingerTimeStats.delta(before: before, after: after)
                                 if result.histogram == nil {
                                     result.missingReason = before.name != after.name ? "layer_changed"
                                         : zip(before.histogram, after.histogram).contains(where: { $1 < $0 }) ? "counter_reset" : "no_frames"
                                 }
-                                result.scene = PerformanceScene.bracket(beforeScene.scene, afterScene.scene)
-                                result.contextReason = PerformanceEndpoint.context(beforeScene, afterScene)
                             } else { result.missingReason = "lost_focus" }
                         }
                     } else { result.missingReason = "lost_focus" }
@@ -105,21 +95,17 @@ final class PerformanceCollector {
             let disableBegan = ProcessInfo.processInfo.systemUptime
             disableTimeStats()
             result.observe("timestats", since: disableBegan)
-            // Read once after the entire frame/OCR bracket. The bounded shadow
-            // probe cannot add a gap between the before screenshot and frames.
-            if !isStopped, let command = GameLogObservation.command(package: package) {
-                let logBegan = ProcessInfo.processInfo.systemUptime
-                let data = run(adb, ["-P", "5038", "-s", "emulator-5582", "shell", command],
-                    maximumBytes: GameLogObservation.maximumResponseBytes, timeoutSeconds: 2)
-                result.gameLog = GameLogObservation.decode(data)
-                result.observe("game_log", since: logBegan)
-            }
+            result.gameLog = logContext(sample: &result)
+            let context = GameLogObservation.bracket(result.logBefore, result.gameLog)
+            result.scene = PerformanceScene(scene: context.scene)
+            result.contextReason = context.reason
+            if !foreground() { result.histogram = nil; result.missingReason = "lost_focus" }
         }
         let totalMS = Int64((ProcessInfo.processInfo.systemUptime - began) * 1000)
         result.collectorMS = max(0, totalMS - (result.durationMS > 0 ? 2000 : 0))
         result.observe("cycle", since: began)
         guard !isStopped else { return }
-        // Keep the existing schedule and wall-time budget during the diagnostic baseline.
+        // Preserve the randomized cadence and existing wall-time budget.
         let scheduledDelay = Double.random(in: 45...75)
         let delay = max(scheduledDelay, Double(result.collectorMS) / 10)
         result.backoff = !result.background && delay > scheduledDelay
@@ -132,21 +118,13 @@ final class PerformanceCollector {
         while !isStopped, ProcessInfo.processInfo.systemUptime < until { Thread.sleep(forTimeInterval: 0.05) }
     }
 
-    private func scene(sample: inout PerformanceSample) -> PerformanceEndpoint {
-        var endpoint = PerformanceEndpoint(reason: "helper_missing")
-        defer { sample.endpoints.append(endpoint) }
-        guard FileManager.default.isExecutableFile(atPath: classifier.path) else { return endpoint }
+    private func logContext(sample: inout PerformanceSample) -> GameLogObservation {
+        guard !isStopped, let command = GameLogObservation.command(package: package) else { return GameLogObservation(outcome: "read_failed") }
         let began = ProcessInfo.processInfo.systemUptime
-        let png = runADB(["exec-out", "screencap", "-p"], maximumBytes: 32*1024*1024)
-        sample.observe("screencap", since: began)
-        guard let png else { endpoint.reason = "capture_failed"; return endpoint }
-        let helperBegan = ProcessInfo.processInfo.systemUptime
-        let data = run(classifier, ["--telemetry-diagnostics-stdin"], input: png, maximumBytes: 2048)
-        sample.observe("classifier", since: helperBegan)
-        if let data { endpoint = PerformanceEndpoint.decode(data, expectedDimensions: expectedDimensions) }
-        else { endpoint.reason = lastRunFailure }
-        endpoint.capturedAt = began
-        return endpoint
+        defer { sample.observe("game_log", since: began) }
+        let data = run(adb, ["-P", "5038", "-s", "emulator-5582", "shell", command],
+                       maximumBytes: GameLogObservation.maximumResponseBytes, timeoutSeconds: 2)
+        return GameLogObservation.decode(data)
     }
 
     private func timeStats(sample: inout PerformanceSample) -> SurfaceFlingerTimeStats.Layer? {
@@ -184,14 +162,13 @@ final class PerformanceCollector {
         run(adb, ["-P", "5038", "-s", "emulator-5582"] + arguments, maximumBytes: maximumBytes, allowStopped: allowStopped)
     }
 
-    private func run(_ executable: URL, _ arguments: [String], input: Data? = nil, maximumBytes: Int, allowStopped: Bool = false, timeoutSeconds: Double = 10) -> Data? {
-        lastRunFailure = "helper_failed"
-        let child = Process(), output = Pipe(), inputPipe = Pipe()
+    private func run(_ executable: URL, _ arguments: [String], maximumBytes: Int, allowStopped: Bool = false, timeoutSeconds: Double = 10) -> Data? {
+        let child = Process(), output = Pipe()
         child.executableURL = executable; child.arguments = arguments
         child.standardOutput = output; child.standardError = FileHandle.nullDevice
-        child.standardInput = input == nil ? FileHandle.nullDevice : inputPipe
+        child.standardInput = FileHandle.nullDevice
         child.environment = ProcessInfo.processInfo.environment.merging([
-            "ANDROID_ADB_SERVER_PORT": "5038", "ADB_MDNS_AUTO_CONNECT": "", "TFT_CLASSIFIER_DEBUG": "0"
+            "ANDROID_ADB_SERVER_PORT": "5038", "ADB_MDNS_AUTO_CONNECT": ""
         ]) { _,new in new }
         lock.lock()
         guard !stopped || allowStopped else { lock.unlock(); return nil }
@@ -206,21 +183,13 @@ final class PerformanceCollector {
             try? output.fileHandleForReading.close()
             lock.lock(); if process === child { process = nil }; lock.unlock()
         }
-        if let input {
-            _ = fcntl(inputPipe.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
-            DispatchQueue.global(qos: .utility).async {
-                try? inputPipe.fileHandleForWriting.write(contentsOf: input)
-                try? inputPipe.fileHandleForWriting.close()
-            }
-        }
         var data = Data()
         while let chunk = try? output.fileHandleForReading.read(upToCount: 65536), !chunk.isEmpty {
             guard data.count + chunk.count <= maximumBytes else { return nil }
             data.append(chunk)
         }
         child.waitUntilExit()
-        if deadline.expired { lastRunFailure = "helper_timeout" }
-        return child.terminationStatus == 0 ? data : nil
+        return !deadline.expired && child.terminationStatus == 0 ? data : nil
     }
 }
 

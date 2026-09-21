@@ -2,8 +2,8 @@ import Foundation
 
 // Cumulative, bounded metadata only. These counters do not change scene labels.
 struct PerformanceDiagnostics: Codable, Equatable {
-    var version = 2
-    var implementation = "screen-bracket-game-log-v2"
+    var version = 3
+    var implementation = "game-log-context-v1"
     var language: String
     var measurements: [String: Int64] = [:]
     var endpoints: [String: Int64] = [:]
@@ -46,7 +46,10 @@ struct PerformanceDiagnostics: Codable, Equatable {
             for i in counts.indices { timings[key, default: [Int64](repeating: 0, count: Self.timingBounds.count)][i] += counts[i] }
         }
         if sample.backoff { backoffWindows += 1 }
-        if !sample.background { gameLog?.record(sample.gameLog, context: context) }
+        if !sample.background {
+            if version >= 3 { gameLog?.record(sample.logBefore, context: nil) }
+            gameLog?.record(sample.gameLog, context: context)
+        }
     }
 }
 

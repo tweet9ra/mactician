@@ -2335,6 +2335,11 @@ enum LauncherTests {
         let logSnapshot = try JSONDecoder().decode(PerformanceSnapshot.self, from: JSONSerialization.data(withJSONObject: logJSON))
         try expect(try JSONSerialization.jsonObject(with: JSONEncoder().encode(logSnapshot)) as! NSDictionary == logJSON as NSDictionary,
             "game log wire fixture agrees with Swift")
+        let contextFixture = try JSONSerialization.jsonObject(with: Data(contentsOf: fixtureURL.deletingLastPathComponent().appendingPathComponent("game-session-performance-log-context-v2.json"))) as! [String: Any]
+        let contextJSON = contextFixture["performance"] as! [String: Any]
+        let contextSnapshot = try JSONDecoder().decode(PerformanceSnapshot.self, from: JSONSerialization.data(withJSONObject: contextJSON))
+        try expect(try JSONSerialization.jsonObject(with: JSONEncoder().encode(contextSnapshot)) as! NSDictionary == contextJSON as NSDictionary,
+            "log context wire fixture agrees with Swift and preserves classifier identity")
         try testPerformanceDiagnostics(runtime: snapshot.runtime)
         let histogram = snapshot.segments[0].histogram
         let row = zip(SurfaceFlingerTimeStats.buckets, histogram).map { "\($0)ms=\($1)" }.joined(separator: " ")
@@ -2471,6 +2476,8 @@ enum LauncherTests {
         let unsupported = PerformanceEndpoint.decode(Data(#"{"diagnostics_version":1,"error":"unsupported_dimensions","dimensions":"other"}"#.utf8), expectedDimensions: "1920x1080")
         try expect(unsupported.reason == "unsupported_dimensions" && unsupported.dimensionMatch == false, "unsupported screenshot sizes are explained")
         var p = PerformanceSnapshot(runtime: runtime, diagnostics: PerformanceDiagnostics(language: "en-US"))
+        p.classifier = "screen-bracket-v1"
+        p.diagnostics?.version = 2; p.diagnostics?.implementation = "screen-bracket-game-log-v2"
         p.readyMS = 0; p.elapsedMS = 600000
         var h = [Int64](repeating: 0, count: 85); h[17] = 100
         var sample = PerformanceSample(histogram: h, durationMS: 2000, scene: combat.scene)
@@ -2495,7 +2502,26 @@ enum LauncherTests {
             "measurement failures keep distinct causes")
         try expect(d.timings["classifier"]?[0] == 1 && d.timings["classifier"]?[1] == 1, "timing upper bounds match the API")
         try expect(d.version == 2 && d.gameLog?.reads["read_failed"] == p.windowsAttempted,
-            "one shadow read result per foreground attempt, background excluded")
+            "legacy screenshot diagnostics retain one shadow read per foreground attempt")
+
+        var logs = PerformanceSnapshot(runtime: runtime, diagnostics: PerformanceDiagnostics(language: "ru-RU"))
+        logs.readyMS = 0; logs.elapsedMS = 600000
+        let before = GameLogObservation(outcome: "observed", phaseEvent: "combat_departure", phaseAge: "within_10s", context: "match_activity", identity: "local-only", capturedAt: 100, fileSize: 100)
+        var after = before; after.capturedAt = 102
+        let bracket = GameLogObservation.bracket(before, after)
+        logs.record(PerformanceSample(histogram: h, durationMS: 2000, scene: PerformanceScene(scene: bracket.scene), contextReason: bracket.reason, logBefore: before, gameLog: after))
+        logs.record(PerformanceSample(background: true))
+        logs.record(PerformanceSample(missingReason: "timestats_failed", logBefore: before, gameLog: after))
+        logs.record(PerformanceSample(histogram: h, durationMS: 2000, contextReason: "endpoint_failed", logBefore: before))
+        let ld = logs.diagnostics!
+        try expect(logs.classifier == "game-log-bracket-v1" && ld.version == 3 && ld.endpoints.isEmpty,
+            "new collector uses log context without screenshot endpoints")
+        try expect(logs.windowsAttempted == 3 && logs.windowsMissing == 1 && logs.backgroundSkipped == 1 && ld.gameLog?.reads == ["observed": 5, "read_failed": 1],
+            "two log boundaries for each foreground attempt, including failed frame measurements")
+        try expect(ld.contexts == ["match_activity": 1, "endpoint_failed": 1] && ld.gameLog?.contextsNearEvent == ["match_activity": 1],
+            "context counts only measured windows, near-event counts only the final boundary")
+        try expect(logs.segments.map(\.scene) == ["match_activity", "unknown"] && logs.segments.allSatisfy { $0.stageBand == "unknown" },
+            "accumulation never invents a current phase or round from departure activity")
     }
 
     private static func testGameLogDiagnostics() throws {
@@ -2512,8 +2538,35 @@ enum LauncherTests {
         try expect(result.outcome == "observed" && result.phaseEvent == "combat_departure" && result.phaseAge == "within_10s",
             "real departure meaning and freshness are preserved")
         try expect(result.lifecycle == "state_in_progress" && result.lifecycleAge == "older", "old lifecycle has an explicit age")
+        try expect(result.context == "match_activity", "fresh departure proves recent activity, not combat or round")
+        var after = result; after.capturedAt = now+2
+        try expect(GameLogObservation.bracket(result, after).scene == "match_activity", "matching bounded activity brackets frames")
+        after.identity = "restarted"
+        try expect(GameLogObservation.bracket(result, after).reason == "log_discontinuity", "process or rotation between reads rejected")
+        after = result; after.capturedAt = now+2; after.fileSize = 1
+        try expect(GameLogObservation.bracket(result, after).scene == "unknown", "cross-read truncation rejected")
+        after = result; after.capturedAt = now-2
+        try expect(GameLogObservation.bracket(result, after).scene == "unknown", "clock reversal rejected")
+        after.capturedAt = now+30
+        try expect(GameLogObservation.bracket(result, after).scene == "unknown", "overlong bracket rejected")
+        after = result; after.capturedAt = now+2; after.context = "lobby"
+        try expect(GameLogObservation.bracket(result, after).reason == "state_changed", "lifecycle transition cannot label the whole frame window")
+        let stale = recent.replacingOccurrences(of: "11.31.25", with: "11.30.00")
+        try expect(GameLogObservation.decode(snapshot(stale)).context == "unknown", "old activity is not retained as current context")
+        let skipped = recent.replacingOccurrences(of: "Scheduled phase garbage collection", with: "Skipped scheduling garbage collection as it had been recently scheduled")
+        try expect(GameLogObservation.decode(snapshot(skipped)).context == "match_activity", "skipped GC still carries a departure observation")
+        let lobby = "[2026.09.14-11.31.28:000][2]RMS {\"gameflowPhase\":\"LOBBY\"}\n"
+        try expect(GameLogObservation.decode(snapshot(recent+lobby)).context == "lobby", "new lobby clears earlier match activity")
+        let unknownState = lobby.replacingOccurrences(of: "LOBBY", with: "FUTURE_ENUM")
+        try expect(GameLogObservation.decode(snapshot(recent+unknownState)).context == "unknown", "unknown newer lifecycle invalidates old activity")
+        let searching = lobby.replacingOccurrences(of: "gameflowPhase", with: "phaseName").replacingOccurrences(of: "LOBBY", with: "MATCHMAKING")
+        try expect(GameLogObservation.decode(snapshot(searching+lobby)).context == "matchmaking", "specific phase outranks near-simultaneous lobby envelope")
+        let mixed = lobby.replacingOccurrences(of: "\"LOBBY\"}", with: "\"LOBBY\",\"phaseName\":\"MATCHMAKING\"}")
+        try expect(GameLogObservation.decode(snapshot(mixed)).context == "matchmaking", "specific phase in a mixed-field record outranks generic lobby")
+        try expect(GameLogObservation.decode(snapshot(mixed.replacingOccurrences(of: "MATCHMAKING", with: "FUTURE_ENUM"))).context == "unknown", "unknown specific field cannot be hidden by known lobby in the same record")
+        try expect(GameLogObservation.decode(snapshot(searching.replacingOccurrences(of: "MATCHMAKING", with: "AFK_CHECK"))).context == "match_starting", "ready check is not gameplay")
         let encoded = String(decoding: try JSONEncoder().encode(result), as: UTF8.self)
-        try expect(!encoded.contains("private-test-sentinel") && !encoded.contains("2026") && !encoded.contains("token"), "no raw log or identifiers in output")
+        try expect(!encoded.contains("private-test-sentinel") && !encoded.contains("2026") && !encoded.contains("token") && !encoded.contains("identity") && !encoded.contains("capturedAt") && !encoded.contains("fileSize"), "no raw log or identifiers in output")
         try expect(GameLogObservation.decode(snapshot(recent, finalFile: "11 1000")).outcome == "log_changed", "rotation rejected")
         try expect(GameLogObservation.decode(snapshot(recent, finalFile: "10 900")).outcome == "log_changed", "truncation rejected")
         try expect(GameLogObservation.decode(snapshot(recent, finalProc: proc.replacingOccurrences(of: "10000", with: "10100"))).outcome == "log_changed", "process restart rejected even with reused PID")

@@ -20,3 +20,5 @@ fields are rejected by the server.
 its counters describe one unknown non-gameplay window as well as successful
 combat and a missing frame window. See [field semantics](performance-diagnostics.md).
 Old attempts must not acquire this block during checkpoint recovery.
+
+`game-session-performance-log-context-v2.json` covers schema-v2 events with diagnostics v3 and bounded log-based lifecycle/activity contexts. Older fixtures remain unchanged.

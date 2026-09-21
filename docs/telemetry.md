@@ -223,8 +223,8 @@ zero-latency frames. Only the TFT SurfaceView present-to-present histogram is
 used, with a baseline/delta inside each window. This measures presentation in
 the Android guest, not macOS display latency, input latency or network latency.
 
-Screenshots pass through memory to the bundled classifier before and after a
-sample. Matching phase/stage labels form the context; differing endpoints become
+In screenshot-based versions, screenshots pass through memory to the bundled
+classifier before and after a sample. Matching phase/stage labels form the context; differing endpoints become
 unknown. No image, OCR text, layer name, PID, player name or board contents are
 saved or uploaded. Intermediate transitions are not detectable. Game mode and
 downloaded Riot content are not identified. The classifier recognizes English
@@ -276,3 +276,13 @@ read outcomes and timing counts are sent. Raw log text, identifiers, tokens and
 event timestamps are never saved or uploaded. These shadow observations do not
 change frame labels or assert the current stage/phase. They are standard
 performance collection, with the same queue, retention and cohort suppression.
+
+Diagnostics v3 replace performance screenshots/OCR with two bounded log reads
+surrounding the frame window. Only fresh lifecycle/activity evidence from the
+same game process and log file may label the window as lobby, matchmaking,
+match-starting or recent match activity; failures, discontinuities and differing
+boundary contexts remain unknown. Exact phase and round are not inferred, and
+all stage bands remain unknown. Read metadata and raw text stay local in memory.
+New contexts appear separately in the report, without gameplay eligibility. See
+the [v3 contract](telemetry-contract/performance-diagnostics.md#log-based-context-diagnostics-v3)
+and [validation status](game-log-context.md).

@@ -107,3 +107,57 @@ observations are not evidence of agreement; their exact instants differ. No
 round is inferred from event counts, no log observation changes a frame label,
 and none makes an unknown window eligible as gameplay. This release experiment
 measures source availability, freshness and cost before choosing a hybrid reader.
+
+## Log-based context (diagnostics v3)
+
+New attempts use `classifier=game-log-bracket-v1`, `version=3`,
+`implementation=game-log-context-v1`. Old v1/v2 checkpoints keep their original
+classifier and diagnostic identities on recovery. The API must support v3 before
+these clients send data. The outer event remains schema version 2.
+
+The performance collector no longer invokes screenshots or OCR. Two bounded,
+passive reads surround the frame window: before TimeStats setup and after its
+final snapshot/disable. Both reads must succeed, have the same process PID/start
+identity and file inode, nondecreasing file size, and an increasing guest clock
+no more than 15 seconds apart. A change or unavailable boundary yields unknown;
+foreground and frame-histogram checks remain in force. The randomized 45–75 s
+schedule and 1% wall-time duty backoff remain unchanged.
+
+Each read independently considers only complete records from this process,
+not future records. Recognized evidence expires after 60 seconds; nothing is
+carried into the next read. Within one second, a more specific phase/game-state
+message wins over its general gameflow LOBBY envelope. A newer unrecognized
+lifecycle field invalidates older evidence. Later known lifecycle messages also
+replace older match activity. This is recent log context, not proof of the
+currently rendered screen, completed loading or a continuously observed match.
+
+| `segments.scene` | Evidence |
+| --- | --- |
+| `lobby` | Recent `gameflowPhase=LOBBY` |
+| `matchmaking` | Recent `phaseName=MATCHMAKING` |
+| `match_starting` | Recent `AFK_CHECK`, `CHAMPION_SELECT`, or `gameState=IN_PROGRESS`; loading may still be in progress |
+| `match_activity` | Recent allowlisted Planning/Combat/Draft departure from the runtime-performance subsystem; both scheduled and recently-skipped GC records count |
+| `unknown` | No fresh evidence, failed/discontinuous read or different boundary contexts |
+
+A GC departure is not the current phase. No departure count yields a round.
+All v3 `stage_band` values must be `unknown`; combat/planning are rejected for
+this classifier. Recent match activity has separately labelled descriptive frame
+statistics. It does not contribute to matched gameplay comparisons, slow-session
+eligibility or recognized planning/combat totals. Transitions and overlays may be
+present. Keeping this distinction is essential when evaluating apparent unknown
+reduction against legacy screenshot clients.
+
+There are exactly two `game_log.reads` outcomes per foreground attempt, including
+missing-frame attempts. Other read maps retain one observation per successful
+read. `contexts_near_event` records at most one accepted window, based only on the
+final read. Its recent-read denominator includes both boundaries and is not an
+agreement or accuracy estimate. `timings.game_log` has at most two observations
+per attempt. V3 has no endpoint/state/dimension/signal observations or screenshot,
+classifier and capture-gap timing keys. Measurement reasons remain unchanged.
+Context reasons are the four known scene labels, `both_unknown`, `state_changed`,
+`endpoint_failed`, and `log_discontinuity`; scene counters equal segment windows.
+
+Canonical fixture: `game-session-performance-log-context-v2.json`. The v2 suffix
+names the outer event schema, not diagnostic version. Raw lines, event timestamps,
+process/file identity, player/account information and arbitrary enums remain
+local in memory and never enter telemetry.
