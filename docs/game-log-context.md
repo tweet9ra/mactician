@@ -36,11 +36,16 @@ a qualifying slow-session observation. See the
   It prints only bounded contexts/reasons and wall times. A single-read probe
   without `--bracket` prints the context and bounded source observations.
 
-The owner offered to play a normal match for passive verification. Until that
-run is observed, parser/unit coverage is not a live-match accuracy result and
-there is no measured claim about the new field unknown percentage or FPS impact.
-Deploy API compatibility before distributing the updated launcher. No launcher
-release/version bump is part of this source change.
+Parser/unit coverage is not a live-match accuracy result. A complete ordinary
+match against a labelled timeline remains necessary before claiming phase
+accuracy, a field unknown percentage or an FPS improvement.
+
+Mactician 1.2.5 (build 54) enables this collector. Its compatible API and privacy
+page are deployed before the launcher update. Release verification includes the
+full Swift tests/typecheck, repository and shared-contract checks, Go 1.25.0
+tests with the race detector and vet, and website typecheck/lint/build. Game APKs,
+runtime scripts and graphics profiles remain identical to 1.2.4. Field data from
+this collector must be kept separate from the earlier screen classifier.
 
 ## Incident context supplied September 21
 

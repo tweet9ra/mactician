@@ -19,7 +19,7 @@ Built for two tacticians. Shared with everyone.
 
 ## Project status
 
-- Version: **1.2.4** (build 53)
+- Version: **1.2.5** (build 54)
 - Host architecture: **Apple Silicon (`arm64`)**
 - Minimum deployment target: **macOS 12.0**, enforced by the build target and
   runtime preflight
@@ -94,7 +94,7 @@ Verify the version, build number,
 and the SHA-256 published with that release before opening it.
 
 1. Open the DMG and drag **Mactician** to **Applications**.
-2. Open it. Version 1.2.4 is signed with Apple Developer ID and notarized, so
+2. Open it. Version 1.2.5 is signed with Apple Developer ID and notarized, so
    Gatekeeper can verify it normally without **Open Anyway**.
 3. Review and accept the Android SDK terms, then choose **Install**. About
    2.3 GB is downloaded before extraction and AVD provisioning.
@@ -134,7 +134,7 @@ TFT_GAME_APK_DIR="$PROJECT_DIR/private/tft-apks" \
 ```
 
 This produces `dist/Mactician.app` and
-`dist/Mactician-1.2.4.dmg`, signed ad hoc for local validation.
+`dist/Mactician-1.2.5.dmg`, signed ad hoc for local validation.
 
 ### Provisioning integration test
 

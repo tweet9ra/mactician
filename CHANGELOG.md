@@ -1,10 +1,21 @@
 # Changelog
 
-The current application metadata is version 1.2.4, build 53.
+The current application metadata is version 1.2.5, build 54.
 
 ## Unreleased
 
 Planned for 1.3.0: the validated Global Vulkan buffer-view cache.
+
+## 1.2.5 — 2026-09-25
+
+- Classify performance samples from bounded game-log reads instead of screenshot
+  OCR, independent of game language and display resolution.
+- Report recent lobby, matchmaking, match-starting and match activity separately;
+  preserve unknown context when signals are stale, missing or inconsistent.
+- Keep coarse match activity separate from verified combat/planning and numeric
+  stages. Raw game logs and account details are never saved or uploaded.
+- Preserve game inputs, graphics profiles and the sampling duty budget while
+  establishing a baseline for later performance updates.
 
 ## 1.2.4 — 2026-09-14
 
