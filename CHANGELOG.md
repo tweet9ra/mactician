@@ -11,9 +11,8 @@ The current application metadata is version 1.3.0, build 55.
 
 ### Changed
 
-- Update Global TFT to `18.3-5530794` (version code `8530794`) and Vietnam
-  and Taiwan to `18.2-5450971` (version code `8450971`); pin the verified
-  Global APKs for future launcher builds.
+- Update Global, Vietnam, and Taiwan TFT to `18.4-5637330` (version code
+  `8637330`); pin the verified Global APKs for future launcher builds.
 
 ## 1.3.0 — 2026-09-28
 

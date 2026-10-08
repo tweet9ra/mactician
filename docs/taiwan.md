@@ -12,9 +12,9 @@ Reset removes every edition and the shared Android runtime.
 
 ## Verified release input
 
-Prepared on 2026-09-10 from the APKPure `18.2-5450971` ARM64 XAPK
-([source](https://apkpure.net/teamfight-tactics-league-of-l/com.riotgames.league.teamfighttacticstw/download)).
-Android manifest metadata confirms version code `8450971`.
+Prepared on 2026-10-08 from the APKPure `18.4-5637330` ARM64 XAPK
+([source](https://d.apkpure.net/b/XAPK/com.riotgames.league.teamfighttacticstw?version=latest)).
+Android manifest metadata confirms version code `8637330`.
 Official Android Build Tools 36 verified the cryptographic signatures, package
 IDs, split IDs, and matching version codes of all four APKs. All use the pinned
 Riot certificate SHA-256:
@@ -25,10 +25,10 @@ Riot certificate SHA-256:
 
 | APK | Bytes | SHA-256 |
 | --- | ---: | --- |
-| base.apk | 101622071 | bd0b6b436e369c9edaf96c4ac311b809c90036b5b8ba8c1064418cf923b88abf |
-| config.arm64_v8a.apk | 94106849 | 810a80b9dc2adc3f5714e2740c927d38de82adc0c5fad028ae40f6ddfbe8be90 |
-| config.en.apk | 37273 | cf6ac0c92b8c32ff32ba927240733e64271394952ee8616104f4b0197f1de671 |
-| config.mdpi.apk | 83007 | 5ba288e8338ed9bcf42fa7414427952ff76ef9789b04aeb5c6e5a4191162ccb7 |
+| base.apk | 113013047 | 0f66aa2fbb543649dcaefd858d8a961e0a0c8435ac37a806537bc0acd49dc245 |
+| config.arm64_v8a.apk | 95139041 | d6364e9b3d2fe32ec31b59d04d4880c3d42f6f0417241403b03f1de12c8c5531 |
+| config.en.apk | 37273 | b4f92de2f9739bfd16019a4d6eee8c914c588eb30f9482fb7f700a906d8ddda1 |
+| config.mdpi.apk | 83007 | 22d490bc322da3812b0a3f2078d59d735872c8a158dc7a59a7080ceb9342a0d2 |
 
 ## Update channel
 
@@ -84,3 +84,13 @@ The 18.2 signed game feed was published on 2026-09-10. The public manifest
 passed the launcher's signature verification, and all four downloaded APKs
 matched the tested sizes and SHA-256 hashes with immutable cache headers.
 The launcher appcast was unchanged.
+
+## TFT 18.4 validation — 2026-10-08
+
+The four verified APKs passed the upgrade and 35-second startup checks in a
+read-only AVD session with unchanged `firstInstallTime` and no crash records.
+See [the shared validation record](reproducibility.md#tft-184-5637330-validation--2026-10-08)
+for the source-bundle hash, test setup, and limits.
+
+The signed 18.4 feed was published on 2026-10-08. Its public signature and all
+four APK downloads passed the size/hash checks with immutable cache headers.

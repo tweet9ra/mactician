@@ -8,7 +8,7 @@
 - Node.js only for `scripts/login-tft-from-keychain.command`
 - Android NDK r27d (`27.3.13750724`) for the bundled ARM64 Vulkan cache;
   set `TFT_ANDROID_NDK` to its directory. End users do not need the NDK.
-- Four exact unmodified TFT `18.3-5530794` APK splits in a private local
+- Four exact unmodified TFT `18.4-5637330` APK splits in a private local
   directory; names, sizes, and hashes are in
   `launcher/Resources/release-manifest.json`
 

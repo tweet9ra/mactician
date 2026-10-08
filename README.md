@@ -25,7 +25,7 @@ Built for two tacticians. Shared with everyone.
   runtime preflight
 - Status: **experimental, best effort**; there is no support or compatibility
   SLA
-- Compatibility is pinned to TFT `18.3-5530794`, Android Emulator 37.1.11,
+- Compatibility is pinned to TFT `18.4-5637330`, Android Emulator 37.1.11,
   and Android 36. A game or emulator update can require a new Mactician release.
 
 ## Preview

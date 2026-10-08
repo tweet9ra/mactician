@@ -13,8 +13,9 @@ finishes. Reset removes all editions and the shared runtime.
 
 ## Verified release input
 
-Prepared on 2026-09-10 from the APKPure `18.2-5450971` ARM64 XAPK.
-Android manifest metadata confirms version code `8450971`.
+Prepared on 2026-10-08 from the APKPure `18.4-5637330` ARM64 XAPK
+([source](https://d.apkpure.net/b/XAPK/com.riotgames.league.teamfighttacticsvn?version=latest)).
+Android manifest metadata confirms version code `8637330`.
 Official Android Build Tools 36 verified the cryptographic signatures, package
 IDs, split IDs, and matching version codes of all four APKs. All use the pinned
 Riot certificate SHA-256:
@@ -25,10 +26,10 @@ Riot certificate SHA-256:
 
 | APK | Bytes | SHA-256 |
 | --- | ---: | --- |
-| base.apk | 101626167 | d00294ae8f442586ccc46fa3d60f57ea6457df4c906381c193af2c93c15fa0ea |
-| config.arm64_v8a.apk | 94106849 | 205ad469a49dcb3ceaadebd682404dce7d82cbd602502122d6e3f647608eef3f |
-| config.en.apk | 37273 | 14ca6b77e7e638aeb0eb1c885b94ed48ccb5792b28cca1e2c39a79dc67ec45fd |
-| config.mdpi.apk | 83007 | 0535004ea3f74f881b2a1bd6258b560b97c76e5788d441533f35073da035a8a0 |
+| base.apk | 113017143 | fe37e7fbcdf68c6d74a97ecf1159bb678a1beff902c622cd8b95539b2bcf3abc |
+| config.arm64_v8a.apk | 95139041 | 624143e86e669717e993eef6d504ad1ba0062a7029c74091fca424f1298a5580 |
+| config.en.apk | 37273 | 61154b649700d41c5a38ba9724c4ce059fd9cf706901f5b44c0179f2903be6a7 |
+| config.mdpi.apk | 83007 | 005ceca1e6774febfa97eaa28bd32b7610d409f6168bd45e0fdbea36975b27a3 |
 
 The four private inputs live in `private/tft-vietnam-apks/`. The signed update
 feed is generated with `MACTICIAN_GAME_EDITION=vietnam`; see
@@ -79,3 +80,13 @@ The 18.2 signed game feed was published on 2026-09-10. The public manifest
 passed the launcher's signature verification, and all four downloaded APKs
 matched the tested sizes and SHA-256 hashes with immutable cache headers.
 The launcher appcast was unchanged.
+
+## TFT 18.4 validation — 2026-10-08
+
+The four verified APKs passed the upgrade and 35-second startup checks in a
+read-only AVD session with unchanged `firstInstallTime` and no crash records.
+See [the shared validation record](reproducibility.md#tft-184-5637330-validation--2026-10-08)
+for the source-bundle hash, test setup, and limits.
+
+The signed 18.4 feed was published on 2026-10-08. Its public signature and all
+four APK downloads passed the size/hash checks with immutable cache headers.

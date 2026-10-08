@@ -13,7 +13,7 @@ packages, downloaded Android runtime, AVD userdata, or signing credentials.
 | Google APIs ARM64 system image | Android 36 revision 7 | `fb47d861d6f87230ee0fe70f610d579935ca77f41a0eefbf391595d3dc4b5ee2` |
 | Sparkle | 2.9.4 | `ce89daf967db1e1893ed3ebd67575ed82d3902563e3191ca92aaec9164fbdef9` |
 
-The game release is `18.3-5530794`, package
+The game release is `18.4-5637330`, package
 `com.riotgames.league.teamfighttactics`. The four split names, sizes, and
 SHA-256 values are in `launcher/Resources/release-manifest.json`; the APK bytes
 are deliberately absent from Git.
@@ -21,8 +21,55 @@ are deliberately absent from Git.
 The current release manifest itself hashes to:
 
 ```text
-f125e2d0b27617d5cf4f2ad56878d94c3f193cc5e16d923ac19c1da198238111  launcher/Resources/release-manifest.json
+b2c0ffe7c98901a70116f105aa7e0fc710668c601f9da225e81455ab979275eb  launcher/Resources/release-manifest.json
 ```
+
+## TFT 18.4-5637330 validation — 2026-10-08
+
+Global, Vietnam, and Taiwan `18.4-5637330` (version code `8637330`) were
+extracted from the complete ARM64 Android 9+ APKPure XAPK bundles for their
+respective package IDs. Each edition uses the base, ARM64, English, and MDPI
+splits. Official Android Build Tools 36 verified every APK signature, package,
+version code, and split ID against the pinned Riot certificate SHA-256
+`931d969502f3de01a4c239e4199211ebdc57bb9a7526394b9e3e2d1cc079ff0c`,
+which also matches the previously pinned Global base APK.
+
+| Edition | Complete XAPK SHA-256 |
+| --- | --- |
+| Global | `78160c66f3b4023c25288fc6f4b2306e93c66a85afc2b60c80785abd90dd0643` |
+| Vietnam | `8775a91da6c6abebf8ede87f21d62d63d5786ebb0a083192355de79d60d5f42f` |
+| Taiwan | `c1af53eb6cc8a792dc2923c67803893066a5ed77e3ac71b08633deb105bddaa3` |
+
+Global APK hashes are pinned in the release manifest; regional hashes are
+recorded in [Vietnam](vietnam.md) and [Taiwan](taiwan.md).
+The Vulkan buffer-view-cache allowlist remains restricted to previously tested
+Global builds, so 18.4 automatically uses the existing uncached rendering path.
+
+The exact four splits upgraded Global from `18.3-5530794`, Vietnam from
+`18.1-5423749`, and Taiwan from `18.2-5450971` in a read-only `Tft` AVD session.
+Taiwan's prior pinned package was seeded into that disposable session first.
+All three retained `firstInstallTime`, reached Unreal `GameActivity`, and stayed
+alive for 35 seconds with no fatal or crash records. The session used the
+launcher's OSFT/GuestAngle emulator flags and was stopped after testing.
+Account sign-in, a full match, and performance were not tested.
+
+An initial direct Global launch bypassed the launcher's Vulkan-cache recovery
+and crashed in Android EGL with stale layer settings from the saved AVD.
+The existing `guest-vulkan-view-cache.sh recover` restored those settings;
+the clean upgrade/startup checks passed after running that production recovery
+step. No runtime code or cache allowlist changes were required.
+
+The full tests, Swift typecheck, ad-hoc app build, and nested code-signature
+verification passed. The built app contains the exact tested manifest and
+four Global APKs. Repository validation passed in a clean source copy; the
+working folder's pre-existing `branding/.DS_Store` still trips the metadata check.
+
+All three signed game feeds were published on 2026-10-08. Their public
+manifests passed `HostedGameUpdate.decodeAndVerify` and matched the tested
+packages, versions, hashes, and URLs. All 12 public APK HEAD requests and full
+downloads matched the expected sizes and SHA-256 hashes, with immutable cache
+headers. The Sparkle appcast remained byte-for-byte unchanged; no new
+Mactician app release was published.
 
 ## TFT 18.3-5530794 validation — 2026-09-24
 
