@@ -939,8 +939,8 @@ enum LauncherTests {
             "app bundle identifier"
         )
         try expect(infoPlist["CFBundleIconFile"] as? String == "Mactician.icns", "launcher icon name")
-        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.0", "launcher version")
-        try expect(infoPlist["CFBundleVersion"] as? String == "55", "launcher build")
+        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.1", "launcher version")
+        try expect(infoPlist["CFBundleVersion"] as? String == "56", "launcher build")
         try expect(
             infoPlist["SUFeedURL"] as? String == "https://sergeinaumov.dev/mactician/updates/appcast.xml",
             "Sparkle appcast URL"
@@ -1038,10 +1038,10 @@ enum LauncherTests {
             "emulator host icon name"
         )
         try expect(
-            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.0",
+            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.1",
             "emulator host version"
         )
-        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "55", "emulator host build")
+        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "56", "emulator host build")
         try expect(
             emulatorHostInfo["CFBundleIdentifier"] as? String
                 == "dev.sergeinaumov.mactician.game-host",

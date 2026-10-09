@@ -19,7 +19,7 @@ Built for two tacticians. Shared with everyone.
 
 ## Project status
 
-- Version: **1.3.0** (build 55)
+- Version: **1.3.1** (build 56)
 - Host architecture: **Apple Silicon (`arm64`)**
 - Minimum deployment target: **macOS 12.0**, enforced by the build target and
   runtime preflight
@@ -137,7 +137,7 @@ TFT_GAME_APK_DIR="$PROJECT_DIR/private/tft-apks" \
 ```
 
 This produces `dist/Mactician.app` and
-`dist/Mactician-1.3.0.dmg`, signed ad hoc for local validation.
+`dist/Mactician-1.3.1.dmg`, signed ad hoc for local validation.
 
 ### Provisioning integration test
 

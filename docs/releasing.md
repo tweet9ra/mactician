@@ -1,6 +1,6 @@
 # Releasing
 
-The current metadata is Mactician version 1.3.0, build 55. Version and build
+The current metadata is Mactician version 1.3.1, build 56. Version and build
 numbers live in `launcher/Info.plist` and the matching emulator-host plist.
 Release notes live under `launcher/Resources/release-notes/` using the short
 version as the filename.

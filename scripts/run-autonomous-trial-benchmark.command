@@ -1147,9 +1147,14 @@ prepare_stage_fast() {
     else
         LAST_ITEM_SWIPES=0
     fi
-    # Start the benchmark as soon as the bounded item batch and the single
-    # evidence-driven reinforcement (if any) are complete.
-    tap_game_reference 1965 920
+    # Preserve a requested planning scene for capture before starting combat.
+    local fight_tapped=true
+    if [[ "$TARGET_PHASE" == planning && "${CAPTURED_STAGE[$stage]:-0}" != "1" ]] \
+            && is_target_stage "$stage"; then
+        fight_tapped=false
+    else
+        tap_game_reference 1965 920
+    fi
     integer elapsed=$(( SECONDS - started ))
     "$JQ" -cn \
         --arg utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -1159,9 +1164,10 @@ prepare_stage_fast() {
         --argjson duration_seconds "$elapsed" \
         --argjson board_swipes "$LAST_BOARD_SWIPES" \
         --argjson item_swipes "$LAST_ITEM_SWIPES" \
+        --argjson fight_tapped "$fight_tapped" \
         '{utc:$utc,event:"stage_prepared",stage:$stage,mode:$mode,trial_attempt:$trial_attempt,
           duration_seconds:$duration_seconds,rerolls:0,reward_waypoints:7,
-          xp_attempts:16,board_swipes:$board_swipes,item_swipes:$item_swipes,fight_tapped:true}' \
+          xp_attempts:16,board_swipes:$board_swipes,item_swipes:$item_swipes,fight_tapped:$fight_tapped}' \
         >> "$RUN_DIR/planning-events.jsonl"
     print "Trial action: $mode preparation for $stage completed in ${elapsed}s; reroll=0, board_swipes=$LAST_BOARD_SWIPES, item_swipes=$LAST_ITEM_SWIPES."
 }

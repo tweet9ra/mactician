@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-09",
+  "game_version": "18.4-5637330",
+  "game_version_code": 8637330,
+  "package": "com.riotgames.league.teamfighttactics",
+  "base_apk_sha256": "47a870b3fbe5c7817eb7378298690497cbbdde8fcc9c9c0c123c41c5f48db043",
+  "library_sha256": "8595828c89e232f737850f21fe03336714ea728e41ec876364aca8cdd7052baa",
+  "angle_revision": "1166eec4c0b125e9e945196acfc549983ef72b18",
+  "correctness": {
+    "host_lifecycle_threads_dispatch_ubsan": "pass",
+    "transaction_failure_injection_tests": 8,
+    "android_hwasan_ubsan": "pass",
+    "control_gpu_readbacks": 1024,
+    "cache_gpu_readbacks": 1024,
+    "gpu_mode_order": [
+      1,
+      0,
+      1
+    ],
+    "gpu_mode_changes_attested": true,
+    "probe_activation_properties_restored": true
+  },
+  "evidence_sha256": {
+    "native-tests.log": "5c6285af73e4198e1c78dbb25c5d1feeccad9d8177978a6d6ac29fa0107054be",
+    "android-hwasan.log": "b41e678c433a3679ab4b17efe0643543ca098fa38588f705d236cb8bfb1d35b8",
+    "gpu-control.log": "69c3c6d5ec90b74cb038aecb9fdce8328e87c42512e22bae5e158730255dfd1d",
+    "gpu-layer.log": "9a73ab0342d148487dbab20993028877d720c8dd243ebfdd219d8f6d31ebedf7",
+    "gpu-layer-mode.log": "99f555668efa623a2c895d5fd98a7dda6895f05e73110bd2f391921e62cb850f",
+    "capture-parser-check.json": "ba41f4032992758f3697b065fd718b948b8a505bd2a66f14dfe321c53c2d04dd",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084141Z__tockers_stage1-5__cache184_cache_0_fast_block_1/summary.json": "af1de67c7920d2a1a0ba820c7a54d4e50bfaf83fab4d86c9686398990280275e",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084141Z__tockers_stage1-5__cache184_cache_0_fast_block_1/latency-round-1.txt": "8644896dce761b6d3b3613f7b6c8210a8ba6721dea4e755e6063307deec6d19e",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084141Z__tockers_stage1-5__cache184_cache_0_fast_block_1/before.png": "8a3de137d28a0009dcb3d69511617f1a235d8874a5246e76730820abcb13bd6a",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084141Z__tockers_stage1-5__cache184_cache_0_fast_block_1/after.png": "d961f3316f9a5c8ec74a163baf399ac674908cb848e56ce8ffc63b3c4d325213",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084151Z__tockers_stage1-5__cache184_cache_1_fast_block_2/summary.json": "aaec6039fdb25e1cb58199f42e20265c6ca0efdbe9d95d474741b0bdb349e1b6",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084151Z__tockers_stage1-5__cache184_cache_1_fast_block_2/latency-round-1.txt": "27624af7e0a6e8b71bd51c75f72acc9a4582549cc78e9483371de0a23a16324f",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084151Z__tockers_stage1-5__cache184_cache_1_fast_block_2/before.png": "d961f3316f9a5c8ec74a163baf399ac674908cb848e56ce8ffc63b3c4d325213",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084151Z__tockers_stage1-5__cache184_cache_1_fast_block_2/after.png": "ff966ad341badf47728daee51750434b52c08d4ed308bdc45e83cba33d286467",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084159Z__tockers_stage1-5__cache184_cache_1_fast_block_3/summary.json": "cbdec4b91e67ad7a09823fcbff307f77dd027f1e7dc2fddb6cd9589432faf038",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084159Z__tockers_stage1-5__cache184_cache_1_fast_block_3/latency-round-1.txt": "eef483f12a4048d32553a51c1d0a65f9cfbcff5ccfaa87272d8ea2713868f173",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084159Z__tockers_stage1-5__cache184_cache_1_fast_block_3/before.png": "ff966ad341badf47728daee51750434b52c08d4ed308bdc45e83cba33d286467",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084159Z__tockers_stage1-5__cache184_cache_1_fast_block_3/after.png": "d4ad748792170fcfaf23e41c6996286f8ed41bc2ce83a2e82a3c7665b67f8b6e",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084206Z__tockers_stage1-5__cache184_cache_0_fast_block_4/summary.json": "09364c60682de90cf86175ecf833e75172371f8c089bffd72f4f03aa1ced60f2",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084206Z__tockers_stage1-5__cache184_cache_0_fast_block_4/latency-round-1.txt": "e9b31da888449ef90317c52d81aac1764786d64f81a627d3386e2e30fa077b29",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084206Z__tockers_stage1-5__cache184_cache_0_fast_block_4/before.png": "d4ad748792170fcfaf23e41c6996286f8ed41bc2ce83a2e82a3c7665b67f8b6e",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084206Z__tockers_stage1-5__cache184_cache_0_fast_block_4/after.png": "b33c296774b1011958ec0434cdc614a7e51478f63ab9f4d32d6eda15d4b96107",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084213Z__tockers_stage1-5__cache184_cache_1_fast_block_5/summary.json": "f6e71cbe99a8c1f9115a7e96b788b17ad0bc8237635affab775605eff624e4d5",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084213Z__tockers_stage1-5__cache184_cache_1_fast_block_5/latency-round-1.txt": "a2d6b6c74fb4104bd6fc2ba6f8cef90abea4efe51d2efb746d5a69631d9322a5",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084213Z__tockers_stage1-5__cache184_cache_1_fast_block_5/before.png": "b33c296774b1011958ec0434cdc614a7e51478f63ab9f4d32d6eda15d4b96107",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084213Z__tockers_stage1-5__cache184_cache_1_fast_block_5/after.png": "ca8574fc359da7916c8a83185a6b7da8973153dbe6f462934fc764484d23a7f2",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084220Z__tockers_stage1-5__cache184_cache_0_fast_block_6/summary.json": "bfe6e7288b3d7f062e9ba7b531e62702d885f0039f4694d281473a7cab779165",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084220Z__tockers_stage1-5__cache184_cache_0_fast_block_6/latency-round-1.txt": "6b714984fa6feb05a1f00ca3eb25db100e755c9b367b237797fd2293fd3a4bd1",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084220Z__tockers_stage1-5__cache184_cache_0_fast_block_6/before.png": "ca8574fc359da7916c8a83185a6b7da8973153dbe6f462934fc764484d23a7f2",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084220Z__tockers_stage1-5__cache184_cache_0_fast_block_6/after.png": "c0e14a39b92e019456a96e9f8c3096fd0029cd5c6e0297a4e8ab19d3a4985f0d",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084227Z__tockers_stage1-5__cache184_cache_0_fast_block_7/summary.json": "c0cf3479e7e796310e0f1bee8705908562eabb794bcd26a01a823eeb70ae33e2",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084227Z__tockers_stage1-5__cache184_cache_0_fast_block_7/latency-round-1.txt": "761a960e0e82195ba4cd4865a0d62a66948f951e31e8b26b6b1d2911190755ea",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084227Z__tockers_stage1-5__cache184_cache_0_fast_block_7/before.png": "c0e14a39b92e019456a96e9f8c3096fd0029cd5c6e0297a4e8ab19d3a4985f0d",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084227Z__tockers_stage1-5__cache184_cache_0_fast_block_7/after.png": "2e8bb0aecd3151962d29fa2c175b76eac8924b9ef3fdf03664387ffceb395277",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084234Z__tockers_stage1-5__cache184_cache_1_fast_block_8/summary.json": "40ccebc88e5edc48e1f0d9f327d82185c0d1f012383739e8feaa8ea2207187f1",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084234Z__tockers_stage1-5__cache184_cache_1_fast_block_8/latency-round-1.txt": "2c644c85d1a3140b5570ea6856ea281302e680da939da41ee353f65e76d2e441",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084234Z__tockers_stage1-5__cache184_cache_1_fast_block_8/before.png": "2e8bb0aecd3151962d29fa2c175b76eac8924b9ef3fdf03664387ffceb395277",
+    "runs/20261009T083631Z__cache-184-planning__78994/measurements/20261009T084234Z__tockers_stage1-5__cache184_cache_1_fast_block_8/after.png": "fca754ed8a3f930da4aa8df71d1ebb049fb44dd5d5f5abf56fc312c8b518f432",
+    "game-crash-final.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "game-cache-final.log": "dee3d5abdfc7dcbe8e81d346f0c4dd0fd85829189b89797e9744e1fe5f34e20f",
+    "runs/20261009T083631Z__cache-184-planning__78994/live-cache-blocks.json": "84d0fd69c8031e86725147909670ceff70f4b61522a4a1082031bb4718919057",
+    "runs/20261009T083631Z__cache-184-planning__78994/run-result.json": "0d642bf931de3d0aac2b03adfc69ef3c72cdece889f084f757f22db2dfb67d07",
+    "runs/20261009T083631Z__cache-184-planning__78994/cleanup.txt": "ebfa0231ace09d18e95af27b284913afc5ac8f7fd9e2190838199f8449ee5464",
+    "runs/20261009T083631Z__cache-184-planning__78994/launcher.log": "37c077b06e118f59844d756ef1ef9f6aaef75fe0718d458685fe56d6f9a306f3",
+    "runs/20261009T083631Z__cache-184-planning__78994/capture-1-5.log": "4c857151218b8e6b7d0a98e0c336df07d424f9aa84926dc2f48d9a3f8225bc82",
+    "runs/20261009T083631Z__cache-184-planning__78994/planning-events.jsonl": "76e9bc8fb1bdb34871e6d90d2fc6598204e18591f28ace26fb2adb762d413888",
+    "tools/capture-vulkan-cache-pairs.py": "54795c774c77c553288d3fef49ca8967553068e1617dd95c523322e62a6a3e5d",
+    "scripts/run-autonomous-trial-benchmark.command": "526f7e440768000e888feb7e036a49606a00c04785382ab27f70ae9026babf29"
+  },
+  "measurement_tool_fixes": [
+    "Correct overescaped regular expressions for SurfaceFlinger layer names, cache-mode log lines and mapped library paths; verified with live game data.",
+    "Preserve target planning rounds after board preparation instead of automatically tapping Fight; record the actual fight_tapped value."
+  ],
+  "planning_comparison": {
+    "scene": "Tockers Trials 1-5 planning",
+    "host": "Apple M1 Max",
+    "display": "2560x1440@60Hz",
+    "density": 416,
+    "vcpus": 7,
+    "memory_mb": 6144,
+    "profile": "Maximum FPS",
+    "active_overlay_sha256": "1b8a80bcedb486cd7ea2d18fa92eae1d189008b6760a41ff349ecc5c24ddf7d2",
+    "profile_sha256": "b0b83466abef72b1f7f751bf92e804abbd3f9a1aac02f502a5d979d40f2b71ef",
+    "same_game_pid": 3375,
+    "order": [
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "window_seconds": 2,
+    "accepted_windows": 8,
+    "metadata_verified": true,
+    "all_mode_scene_host_gates_passed": true,
+    "medians": {
+      "off": {
+        "fps": 44.4355,
+        "mean_ms": 22.505097,
+        "p95_ms": 34.0905,
+        "p99_ms": 34.732397
+      },
+      "on": {
+        "fps": 60.005,
+        "mean_ms": 16.66517,
+        "p95_ms": 18.504312,
+        "p99_ms": 19.461438
+      }
+    },
+    "median_fps_gain_percent": 35.038,
+    "median_p95_reduction_percent": 45.72,
+    "visual_review": "Block 1, 2 and 8 after-images inspected: same roster, board and loot; no obvious corruption.",
+    "blocks": [
+      {
+        "index": 1,
+        "mode": 0,
+        "accepted": true,
+        "pacing": {
+          "samples": 88,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 44.222,
+          "mean_ms": 22.613326,
+          "p50_ms": 17.929042,
+          "p95_ms": 33.224625,
+          "p99_ms": 34.379708,
+          "max_ms": 73.854916,
+          "frames_over_ms": {
+            "16.67": 69,
+            "20": 30,
+            "33.33": 5,
+            "40": 1,
+            "50": 1,
+            "60": 1,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 2,
+        "mode": 1,
+        "accepted": true,
+        "pacing": {
+          "samples": 122,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 59.994,
+          "mean_ms": 16.668255,
+          "p50_ms": 16.530083,
+          "p95_ms": 19.047625,
+          "p99_ms": 20.258375,
+          "max_ms": 23.654625,
+          "frames_over_ms": {
+            "16.67": 59,
+            "20": 3,
+            "33.33": 0,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 3,
+        "mode": 1,
+        "accepted": true,
+        "pacing": {
+          "samples": 122,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 60.019,
+          "mean_ms": 16.661456,
+          "p50_ms": 16.672208,
+          "p95_ms": 18.466167,
+          "p99_ms": 19.262042,
+          "max_ms": 21.543458,
+          "frames_over_ms": {
+            "16.67": 62,
+            "20": 2,
+            "33.33": 0,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 4,
+        "mode": 0,
+        "accepted": true,
+        "pacing": {
+          "samples": 91,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 45.481,
+          "mean_ms": 21.987307,
+          "p50_ms": 17.921,
+          "p95_ms": 34.263417,
+          "p99_ms": 35.152042,
+          "max_ms": 36.256416,
+          "frames_over_ms": {
+            "16.67": 67,
+            "20": 29,
+            "33.33": 8,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 5,
+        "mode": 1,
+        "accepted": true,
+        "pacing": {
+          "samples": 121,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 60.016,
+          "mean_ms": 16.662086,
+          "p50_ms": 16.798542,
+          "p95_ms": 18.542458,
+          "p99_ms": 19.171417,
+          "max_ms": 21.318,
+          "frames_over_ms": {
+            "16.67": 64,
+            "20": 2,
+            "33.33": 0,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 6,
+        "mode": 0,
+        "accepted": true,
+        "pacing": {
+          "samples": 88,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 43.641,
+          "mean_ms": 22.914035,
+          "p50_ms": 18.282666,
+          "p95_ms": 33.917583,
+          "p99_ms": 34.536959,
+          "max_ms": 34.716625,
+          "frames_over_ms": {
+            "16.67": 68,
+            "20": 33,
+            "33.33": 9,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 7,
+        "mode": 0,
+        "accepted": true,
+        "pacing": {
+          "samples": 90,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 44.649,
+          "mean_ms": 22.396869,
+          "p50_ms": 17.915833,
+          "p95_ms": 34.563875,
+          "p99_ms": 34.927834,
+          "max_ms": 34.94575,
+          "frames_over_ms": {
+            "16.67": 68,
+            "20": 32,
+            "33.33": 13,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      },
+      {
+        "index": 8,
+        "mode": 1,
+        "accepted": true,
+        "pacing": {
+          "samples": 121,
+          "rounds": 1,
+          "window_seconds": 2.0,
+          "fps": 59.901,
+          "mean_ms": 16.694272,
+          "p50_ms": 16.682709,
+          "p95_ms": 18.284791,
+          "p99_ms": 19.660834,
+          "max_ms": 21.314167,
+          "frames_over_ms": {
+            "16.67": 62,
+            "20": 1,
+            "33.33": 0,
+            "40": 0,
+            "50": 0,
+            "60": 0,
+            "100": 0
+          }
+        }
+      }
+    ]
+  },
+  "cleanup": {
+    "benchmark_succeeded": true,
+    "test_emulator_stopped": true,
+    "cache_settings_and_staged_library_restored": true,
+    "test_avd_config_restored": true,
+    "original_user_avd_config_unchanged": true,
+    "original_user_avd_config_sha256": {
+      "config.ini": "d0ee0d1e5b39c58e6909078bf4a363f1988cd3e8c5b95960dc9ddb366277f36a",
+      "hardware-qemu.ini": "d9d86107405cfca23b1168d4c236eb32bfbbb66648646583c4062c6e4e8e5753"
+    }
+  },
+  "game_crash_buffer_empty_after_measurement": true,
+  "rejected_run": {
+    "reason": "Old benchmark preparation tapped Fight before target planning capture; stage 1-5 missed. No performance samples accepted.",
+    "rollback_verified": true
+  },
+  "limitations": [
+    "Early Global planning scene only; no quantitative combat, full-match, late-PvP or regional-edition comparison in this run.",
+    "Measured off mode keeps the layer loaded and disables reuse; it is not a layer-unloaded comparison.",
+    "At validation time, public allowlist, installed application and game feeds remained unchanged; 18.4 was admitted only in the isolated test runtime."
+  ],
+  "local_evidence_root": "/private/tmp/mactician-cache-20261009",
+  "public_cache_allowlist_changed_during_validation": false
+}

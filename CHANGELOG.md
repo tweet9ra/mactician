@@ -1,8 +1,10 @@
 # Changelog
 
-The current application metadata is version 1.3.0, build 55.
+The current application metadata is version 1.3.1, build 56.
 
 ## Unreleased
+
+## 1.3.1 — 2026-10-09
 
 ### Added
 
@@ -11,6 +13,9 @@ The current application metadata is version 1.3.0, build 55.
 
 ### Changed
 
+- Enable the Vulkan buffer-view cache for the verified Global TFT
+  `18.4-5637330` build. Local paired planning measurements on M1 Max improved
+  median FPS from 44.44 to 60.00; other game revisions keep the existing gate.
 - Update Global, Vietnam, and Taiwan TFT to `18.4-5637330` (version code
   `8637330`); pin the verified Global APKs for future launcher builds.
 

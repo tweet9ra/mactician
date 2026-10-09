@@ -59,14 +59,14 @@ def layer_name():
     matches = [v for v in lines if 'SurfaceView[' + activity + '](BLAST)' in v]
     if len(matches) != 1:
         raise RuntimeError('Expected one TFT SurfaceView')
-    return re.sub('^RequestedLayerState\\{(.*) parentId=[^}]*\\}$', '\\1', matches[0])
+    return re.sub(r'^RequestedLayerState\{(.*) parentId=[^}]*\}$', r'\1', matches[0])
 
 def mode_attested(mode):
     if shell('pidof', package) != pid:
         return False
     lines = command(adb + ['logcat', '-d', '-v', 'threadtime', '-s', 'MacticianVkView:I']).splitlines()
-    relevant = [l for l in lines if re.search('\\s' + re.escape(pid) + '\\s+\\d+\\s+I\\s+MacticianVkView:', l) and re.search('\\benabled=[01]\\b', l)]
-    return bool(relevant and re.search('\\benabled=' + str(mode) + '\\b', relevant[-1]))
+    relevant = [l for l in lines if re.search(r'\s' + re.escape(pid) + r'\s+\d+\s+I\s+MacticianVkView:', l) and re.search(r'\benabled=[01]\b', l)]
+    return bool(relevant and re.search(r'\benabled=' + str(mode) + r'\b', relevant[-1]))
 
 def pacing(raw):
     stamps = []
@@ -148,7 +148,7 @@ try:
     assert len(base) == 1
     actual_hash = shell('sha256sum', base[0]).split()[0]
     assert actual_hash == env['TFT_ANGLE_OPENGL_APK_SHA256']
-    cache_paths = set(re.findall('/[^\\s]*libVkLayer_Mactician[^\\s]*\\.so', maps))
+    cache_paths = set(re.findall(r'/[^\s]*libVkLayer_Mactician[^\s]*\.so', maps))
     assert len(cache_paths) == 1
     cache_path = cache_paths.pop()
     cache_hash = shell('sha256sum', cache_path).split()[0]

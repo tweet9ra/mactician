@@ -95,13 +95,14 @@ case "$VIEW_CACHE_MODE" in
     *) print -u2 'TFT_VULKAN_VIEW_CACHE must be auto, 0, or 1.'; exit 2 ;;
 esac
 # Enable only the exact Global builds selected for this release. Quantitative
-# paired captures cover 18.1; do not extrapolate those results to 18.3.
+# paired captures cover 18.1 and 18.4; do not extrapolate those results to 18.3.
 # Other game revisions fall back to the uncached path.
 if [[ "$VIEW_CACHE_MODE" != 0 && "$RENDERER" == angle-opengl \
         && "$GUEST_GL_DRIVER" == angle \
         && "$PACKAGE" == com.riotgames.league.teamfighttactics \
         && ( "$ORIGINAL_BASE_SHA256" == 96a78f675d02cc3135891af0d3af70a2fac69794d72a5733c7c79cbef3611813 \
-            || "$ORIGINAL_BASE_SHA256" == 65c0a77440e2b60a409050881da15719aeeb66cf3bea3fe37f2226fe5718cd18 ) \
+            || "$ORIGINAL_BASE_SHA256" == 65c0a77440e2b60a409050881da15719aeeb66cf3bea3fe37f2226fe5718cd18 \
+            || "$ORIGINAL_BASE_SHA256" == 47a870b3fbe5c7817eb7378298690497cbbdde8fcc9c9c0c123c41c5f48db043 ) \
         && -f "$VIEW_CACHE_LIBRARY" && -f "$VIEW_CACHE_LIBRARY.sha256" ]]; then
     VIEW_CACHE_SHA256="$(< "$VIEW_CACHE_LIBRARY.sha256")"
     if [[ ! "$VIEW_CACHE_SHA256" =~ '^[0-9a-f]{64}$' ]] \
