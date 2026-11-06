@@ -4,6 +4,13 @@ The current application metadata is version 1.3.2, build 57.
 
 ## Unreleased
 
+### Changed
+
+- Update Global, Vietnam, and Taiwan TFT to `18.6-5845453` (version code
+  `8845453`); pin the verified Global APKs for future launcher builds. The
+  Vulkan buffer-view cache stays gated to previously measured builds, so 18.6
+  uses the uncached rendering path.
+
 ## 1.3.2 — 2026-11-06
 
 - Fix TFT 18.6 crashing when entering a match by initializing Android device

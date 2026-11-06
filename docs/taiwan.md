@@ -12,9 +12,9 @@ Reset removes every edition and the shared Android runtime.
 
 ## Verified release input
 
-Prepared on 2026-10-08 from the APKPure `18.4-5637330` ARM64 XAPK
+Prepared on 2026-11-06 from the APKPure `18.6-5845453` ARM64 XAPK
 ([source](https://d.apkpure.net/b/XAPK/com.riotgames.league.teamfighttacticstw?version=latest)).
-Android manifest metadata confirms version code `8637330`.
+Android manifest metadata confirms version code `8845453`.
 Official Android Build Tools 36 verified the cryptographic signatures, package
 IDs, split IDs, and matching version codes of all four APKs. All use the pinned
 Riot certificate SHA-256:
@@ -25,10 +25,10 @@ Riot certificate SHA-256:
 
 | APK | Bytes | SHA-256 |
 | --- | ---: | --- |
-| base.apk | 113013047 | 0f66aa2fbb543649dcaefd858d8a961e0a0c8435ac37a806537bc0acd49dc245 |
-| config.arm64_v8a.apk | 95139041 | d6364e9b3d2fe32ec31b59d04d4880c3d42f6f0417241403b03f1de12c8c5531 |
-| config.en.apk | 37273 | b4f92de2f9739bfd16019a4d6eee8c914c588eb30f9482fb7f700a906d8ddda1 |
-| config.mdpi.apk | 83007 | 22d490bc322da3812b0a3f2078d59d735872c8a158dc7a59a7080ceb9342a0d2 |
+| base.apk | 97866039 | 25d4218d92ce1a1903737d00d89fda0dbb4c4f688eb2c1248e933a7f7ac27f4f |
+| config.arm64_v8a.apk | 99396662 | 5ca2e2e2dfc2e9aebb90aa5a2752d17ad226a2d9b4ae37e7b5dfbc129e4ac2d0 |
+| config.en.apk | 37273 | 5320ee6d067774a3310b1b9d0f3710212347ac8e8dfb58ae2657da870de30f92 |
+| config.mdpi.apk | 83007 | 64be4ead432e92824663ee0fa013daf8c74acc1994e02dca51973e26e6a5f33d |
 
 ## Update channel
 
@@ -94,3 +94,10 @@ for the source-bundle hash, test setup, and limits.
 
 The signed 18.4 feed was published on 2026-10-08. Its public signature and all
 four APK downloads passed the size/hash checks with immutable cache headers.
+
+## TFT 18.6 signature verification — 2026-11-06
+
+The four APKs passed `scripts/verify-game-apks.py` (pinned Riot certificate,
+package, split IDs, and matching version codes). See
+[the shared validation record](reproducibility.md#tft-186-5845453-validation--2026-11-06)
+for the source-bundle hash and limits.

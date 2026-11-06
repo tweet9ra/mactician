@@ -1128,7 +1128,7 @@ enum LauncherTests {
         try expect(GameLanguage.language(withID: "ru-RU").title == "Russian", "Russian game language")
         try expect(GameLanguage.language(withID: "unsupported") == .english, "language fallback")
         try expect(
-            LauncherMetadata.gameDisplayVersion(from: manifest.game.version) == "18.4",
+            LauncherMetadata.gameDisplayVersion(from: manifest.game.version) == "18.6",
             "manifest-derived game display version"
         )
         try expect(
