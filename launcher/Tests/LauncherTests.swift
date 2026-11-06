@@ -939,8 +939,8 @@ enum LauncherTests {
             "app bundle identifier"
         )
         try expect(infoPlist["CFBundleIconFile"] as? String == "Mactician.icns", "launcher icon name")
-        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.1", "launcher version")
-        try expect(infoPlist["CFBundleVersion"] as? String == "56", "launcher build")
+        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.2", "launcher version")
+        try expect(infoPlist["CFBundleVersion"] as? String == "57", "launcher build")
         try expect(
             infoPlist["SUFeedURL"] as? String == "https://sergeinaumov.dev/mactician/updates/appcast.xml",
             "Sparkle appcast URL"
@@ -1038,10 +1038,10 @@ enum LauncherTests {
             "emulator host icon name"
         )
         try expect(
-            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.1",
+            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.2",
             "emulator host version"
         )
-        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "56", "emulator host build")
+        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "57", "emulator host build")
         try expect(
             emulatorHostInfo["CFBundleIdentifier"] as? String
                 == "dev.sergeinaumov.mactician.game-host",
@@ -1257,6 +1257,36 @@ enum LauncherTests {
         )
 
         let overlaySourceRoot = temporary.appendingPathComponent("overlay-source", isDirectory: true)
+        for language in GameLanguage.supported {
+            let commandLine = InstallerService.unrealCommandLine(for: language)
+            try expect(
+                !commandLine.contains("DeviceProfile=")
+                    && !commandLine.contains("-ExecCmds=")
+                    && commandLine.contains("-opengl ")
+                    && commandLine.hasSuffix("-culture=\(language.id)\n"),
+                "do not bypass Android device detection"
+            )
+        }
+        let graphicsProfile = temporary.appendingPathComponent("DeviceProfiles.ini")
+        let profileDirectory = sourceRoot.deletingLastPathComponent()
+            .appendingPathComponent("artifacts/tft-pbe-18.1-5212127-angle-opengl")
+        for filename in ["Android_Codex.DeviceProfiles.shader-prewarm.ini", "Android_Codex.DeviceProfiles.performance-max.ini", "Android_Codex.DeviceProfiles.effects-high.ini"] {
+            let original = try String(contentsOf: profileDirectory.appendingPathComponent(filename), encoding: .utf8)
+            try original.write(to: graphicsProfile, atomically: true, encoding: .utf8)
+            try InstallerService.prepareAndroidGraphicsProfile(at: graphicsProfile)
+            let prepared = try String(contentsOf: graphicsProfile, encoding: .utf8)
+            try expect(
+                prepared.contains("[Android_MatchedFragments DeviceProfile]")
+                    && prepared.contains("BaseProfileName=Android\n")
+                    && !prepared.contains("BaseProfileName=Android_MatchedFragments")
+                    && prepared.split(separator: "\n").filter { $0.hasPrefix("CVars=") }
+                        == original.split(separator: "\n").filter { $0.hasPrefix("CVars=") },
+                "preserve all graphics CVars on the detected profile without an inheritance cycle"
+            )
+            try InstallerService.prepareAndroidGraphicsProfile(at: graphicsProfile)
+            try expect(try String(contentsOf: graphicsProfile, encoding: .utf8) == prepared,
+                "graphics profile preparation is idempotent")
+        }
         let overlayAssets = overlaySourceRoot.appendingPathComponent("assets", isDirectory: true)
         let overlaySource = temporary.appendingPathComponent("base-fixture.apk")
         let overlayDestination = temporary.appendingPathComponent("base-overlay.apk")

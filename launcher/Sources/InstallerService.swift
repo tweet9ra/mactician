@@ -748,7 +748,16 @@ final class InstallerService {
     }
 
     static func unrealCommandLine(for language: GameLanguage) -> String {
-        "-project=\"../../../TFT/TFT.uproject\" -opengl -novsync -ResX=1600 -ResY=900 DeviceProfile=Android_Codex -culture=\(language.id)\n"
+        // A startup DeviceProfile override skips Android selector initialization.
+        // TFT 18.6 reads SRC_GPUFamily from that selector when entering a match.
+        "-project=\"../../../TFT/TFT.uproject\" -opengl -novsync -ResX=1600 -ResY=900 -culture=\(language.id)\n"
+    }
+
+    static func prepareAndroidGraphicsProfile(at url: URL) throws {
+        let profile = try String(contentsOf: url, encoding: .utf8)
+            .replacingOccurrences(of: "[Android_Codex DeviceProfile]", with: "[Android_MatchedFragments DeviceProfile]")
+            .replacingOccurrences(of: "BaseProfileName=Android_MatchedFragments", with: "BaseProfileName=Android")
+        try profile.write(to: url, atomically: true, encoding: .utf8)
     }
 
     static func prepareOverlay(

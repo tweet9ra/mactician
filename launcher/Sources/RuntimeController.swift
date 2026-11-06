@@ -54,6 +54,8 @@ final class RuntimeController {
             language: language
         )
         let graphicsProfile = paths.effectsProfile(for: effectsQuality)
+        // Keep our CVars on the profile selected by Android's normal detection.
+        try InstallerService.prepareAndroidGraphicsProfile(at: graphicsProfile)
         let profileHash = try SystemServices.sha256(of: graphicsProfile)
         guard GuestResourceOptions.cpuCores(
             logicalCPUCount: ProcessInfo.processInfo.processorCount

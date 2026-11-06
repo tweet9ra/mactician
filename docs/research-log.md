@@ -18,6 +18,7 @@ Benchmark tables and acceptance rules are summarized separately in
 10. [Fixed-stage campaign](#fixed-stage-campaign)
 11. [Historical and rejected findings](#historical-and-rejected-findings)
 12. [September buffer-view cache](#september-buffer-view-cache)
+13. [TFT 18.6 match-entry crash](#tft-186-match-entry-crash)
 
 ## Compatibility problem
 
@@ -707,3 +708,27 @@ Native lifecycle/thread/dispatch tests, Android HWASan/UBSan, real GPU readbacks
 and interrupted-launch recovery passed. The separate KosmicKrisp host-driver
 screen was negative for this guest-ANGLE workload. Full measurements and limits
 are in [the experiment report](performance-experiments-20260908.md).
+
+## TFT 18.6 match-entry crash
+
+Global `18.6-5845453` reproduced a GameThread SIGSEGV at `libUnreal.so+0x3a575bc`
+immediately after entering a match. The failing instruction dereferenced a
+missing selector-property map entry at address `0x8`; the key was `SRC_GPUFamily`.
+The startup `DeviceProfile=Android_Codex` override skipped normal Android device
+detection, leaving that map uninitialized. Launcher shutdown after game exit
+then closed Android as well.
+
+Removing the override restored device detection and match entry, but the stock
+profile also changed framebuffer scaling and graphics settings. The fix keeps
+normal selection and remaps the selected Mactician graphics profile to
+`Android_MatchedFragments`, inheriting from `Android` to avoid a parent cycle.
+Every existing graphics CVar remains unchanged. Historical experiment profiles
+stay intact; only the runtime copy is adapted. A deferred `dp.Override` through
+`-ExecCmds` was ignored by this Shipping build and is not used.
+
+On M1 Max, the corrected run logged `SRC_GPUFamily: Apple M1 Max`, selected the
+adapted profile, restored the 3840x2160 framebuffer and normal UI scale, and
+survived more than four minutes in the same live match with an empty Android
+crash buffer. Unit tests cover command-line generation, preservation of all
+graphics CVars, parent selection, and repeated profile preparation. Other
+editions and hardware were not exercised in this validation.

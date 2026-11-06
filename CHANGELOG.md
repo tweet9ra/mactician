@@ -1,8 +1,14 @@
 # Changelog
 
-The current application metadata is version 1.3.1, build 56.
+The current application metadata is version 1.3.2, build 57.
 
 ## Unreleased
+
+## 1.3.2 — 2026-11-06
+
+- Fix TFT 18.6 crashing when entering a match by initializing Android device
+  detection before applying the existing graphics settings.
+- Preserve graphics quality, framebuffer resolution, and interface scaling.
 
 ## 1.3.1 — 2026-10-09
 
