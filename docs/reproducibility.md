@@ -13,7 +13,7 @@ packages, downloaded Android runtime, AVD userdata, or signing credentials.
 | Google APIs ARM64 system image | Android 36 revision 7 | `fb47d861d6f87230ee0fe70f610d579935ca77f41a0eefbf391595d3dc4b5ee2` |
 | Sparkle | 2.9.4 | `ce89daf967db1e1893ed3ebd67575ed82d3902563e3191ca92aaec9164fbdef9` |
 
-The game release is `18.4-5637330`, package
+The game release is `18.6-5845453`, package
 `com.riotgames.league.teamfighttactics`. The four split names, sizes, and
 SHA-256 values are in `launcher/Resources/release-manifest.json`; the APK bytes
 are deliberately absent from Git.
@@ -21,8 +21,43 @@ are deliberately absent from Git.
 The current release manifest itself hashes to:
 
 ```text
-b2c0ffe7c98901a70116f105aa7e0fc710668c601f9da225e81455ab979275eb  launcher/Resources/release-manifest.json
+a97253e599dfa3e65086dca16e2d93c8973a4dce81209b5c6284ea104b071f8d  launcher/Resources/release-manifest.json
 ```
+
+## TFT 18.6-5845453 validation — 2026-11-06
+
+Global, Vietnam, and Taiwan `18.6-5845453` (version code `8845453`) were
+extracted from the complete ARM64 APKPure XAPK bundles for their respective
+package IDs. Each edition uses the base, ARM64, English, and MDPI splits.
+`scripts/verify-game-apks.py` with official Android Build Tools 36 verified
+every APK signature, package, version code, and split ID against the pinned
+Riot certificate SHA-256
+`931d969502f3de01a4c239e4199211ebdc57bb9a7526394b9e3e2d1cc079ff0c`.
+The four Global APKs are byte-identical to the signed hosted Global feed
+published on 2026-11-05.
+
+| Edition | Complete XAPK SHA-256 |
+| --- | --- |
+| Global | `59c1650278dec18c618a97c27f7d05a07ceb4d4f33179bbc2a665362dbddac6e` |
+| Vietnam | `5657d6e5c4a96b8ae9c953aee8dea39ca88fac250b3302bf57908116c8749d2e` |
+| Taiwan | `d439e8b6028da3353859185b556d73dc1b840a1c34cfe282c60df7cb621db825` |
+
+Global APK hashes are pinned in the release manifest; regional hashes are
+recorded in [Vietnam](vietnam.md) and [Taiwan](taiwan.md).
+The Vulkan buffer-view-cache allowlist remains restricted to previously tested
+Global builds, so 18.6 automatically uses the existing uncached rendering path.
+Mactician 1.3.2's match-start fix is required for 18.6.
+
+The full tests, Swift typecheck, ad-hoc Mactician 1.3.2 build with the four
+Global APKs, and nested code-signature verification passed. The provisioning
+integration test passed and installed the bundled 18.6 release. Repository
+validation passed in a clean source copy; the working folder's Spotlight
+`kMDItemTextContentLanguage` attribute on an existing artifact still trips the
+metadata check.
+
+Not yet done for 18.6: the in-place upgrade and startup check on an existing
+AVD, account sign-in, a full match, and performance measurement. Signed 18.6
+game feeds were already published upstream on 2026-11-05.
 
 ## TFT 18.4-5637330 validation — 2026-10-08
 

@@ -13,9 +13,9 @@ finishes. Reset removes all editions and the shared runtime.
 
 ## Verified release input
 
-Prepared on 2026-10-08 from the APKPure `18.4-5637330` ARM64 XAPK
+Prepared on 2026-11-06 from the APKPure `18.6-5845453` ARM64 XAPK
 ([source](https://d.apkpure.net/b/XAPK/com.riotgames.league.teamfighttacticsvn?version=latest)).
-Android manifest metadata confirms version code `8637330`.
+Android manifest metadata confirms version code `8845453`.
 Official Android Build Tools 36 verified the cryptographic signatures, package
 IDs, split IDs, and matching version codes of all four APKs. All use the pinned
 Riot certificate SHA-256:
@@ -26,10 +26,10 @@ Riot certificate SHA-256:
 
 | APK | Bytes | SHA-256 |
 | --- | ---: | --- |
-| base.apk | 113017143 | fe37e7fbcdf68c6d74a97ecf1159bb678a1beff902c622cd8b95539b2bcf3abc |
-| config.arm64_v8a.apk | 95139041 | 624143e86e669717e993eef6d504ad1ba0062a7029c74091fca424f1298a5580 |
-| config.en.apk | 37273 | 61154b649700d41c5a38ba9724c4ce059fd9cf706901f5b44c0179f2903be6a7 |
-| config.mdpi.apk | 83007 | 005ceca1e6774febfa97eaa28bd32b7610d409f6168bd45e0fdbea36975b27a3 |
+| base.apk | 97870135 | 5d92ff40ac5e93342252e30888681a058de5ba78734c93a01b3a3fc80fc6b43f |
+| config.arm64_v8a.apk | 99396662 | 586251fe7d123cf565e985789a23139e5b338c9e16904894ac2c41b1175b443f |
+| config.en.apk | 37273 | f43d53cb71fb93e26c7a8a4fce017639dce3b4b387a2a4bd336c4096f8de05f7 |
+| config.mdpi.apk | 83007 | b953a4d32c3a708e8313d6dc3b7022c50a70530be473bbe020cdde56ed2bd06e |
 
 The four private inputs live in `private/tft-vietnam-apks/`. The signed update
 feed is generated with `MACTICIAN_GAME_EDITION=vietnam`; see
@@ -90,3 +90,10 @@ for the source-bundle hash, test setup, and limits.
 
 The signed 18.4 feed was published on 2026-10-08. Its public signature and all
 four APK downloads passed the size/hash checks with immutable cache headers.
+
+## TFT 18.6 signature verification — 2026-11-06
+
+The four APKs passed `scripts/verify-game-apks.py` (pinned Riot certificate,
+package, split IDs, and matching version codes). See
+[the shared validation record](reproducibility.md#tft-186-5845453-validation--2026-11-06)
+for the source-bundle hash and limits.
