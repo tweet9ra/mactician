@@ -19,7 +19,7 @@ Built for two tacticians. Shared with everyone.
 
 ## Project status
 
-- Version: **1.3.2** (build 57)
+- Version: **1.3.3** (build 58)
 - Host architecture: **Apple Silicon (`arm64`)**
 - Minimum deployment target: **macOS 12.0**, enforced by the build target and
   runtime preflight
@@ -51,7 +51,8 @@ is configured independently.
   preferences across full application updates.
 - Repairs incomplete installs and a known zero-byte streaming-install cache
   without clearing unrelated app data.
-- Provides game hotkeys for shop, reroll, XP, item/trait and player/damage tabs,
+- Provides game hotkeys for shop, reroll, XP, selling the unit under the cursor
+  with **E**, item/trait and player/damage tabs,
   plus the macOS window-fill shortcut.
 - Links to the feedback board and [donations](https://app.lava.top/mactician?tabId=donate).
 - Uses a Sparkle appcast with Ed25519 archive verification for updates; public
@@ -137,7 +138,7 @@ TFT_GAME_APK_DIR="$PROJECT_DIR/private/tft-apks" \
 ```
 
 This produces `dist/Mactician.app` and
-`dist/Mactician-1.3.2.dmg`, signed ad hoc for local validation.
+`dist/Mactician-1.3.3.dmg`, signed ad hoc for local validation.
 
 ### Provisioning integration test
 

@@ -59,6 +59,20 @@ System Settings. The bridge retries after permission is granted. Hotkeys are
 deliberately inactive outside TFT's exact `GameActivity`; the official Riot
 login WebView and unknown activities pass input through unchanged.
 
+## A white haze appears after pressing Space
+
+Without the hotkey bridge, a physical key can focus the full-screen Android
+container above Unreal's game surface. AppCompat then draws its white focus
+ripple over the game. The haze disappears in Android Recents while the window
+is unfocused, and returns when the game regains focus.
+
+Before starting TFT, the runtime replaces only the game's native Android ripple
+color with a transparent resource overlay. This also removes native Android
+button ripples inside TFT; Unreal visuals and the Riot login WebView's HTML
+styles are unaffected. The protection works without macOS Accessibility access.
+It is reapplied at launch because fabricated overlays may be cleared on reboot.
+Never apply resource changes during a match: Android may restart the app.
+
 ## Repair versus Reset
 
 **Repair Installation** preserves the AVD, Riot sign-in, game assets, and

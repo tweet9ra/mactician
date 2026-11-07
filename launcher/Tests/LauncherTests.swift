@@ -175,6 +175,38 @@ enum LauncherTests {
                 && BridgeHotkeyTarget.players.pixels(width: 3840, height: 2160) == (3744, 86),
             "V players-and-damage hotkey touch targets"
         )
+        let saleWindow = CGRect(x: 100, y: 200, width: 1_280, height: 748)
+        let saleSource = BridgeUnitSale.source(cursor: CGPoint(x: 420, y: 876),
+                                               window: saleWindow, width: 3_840, height: 2_160)
+        try expect(
+            BridgeKeyboardBinding.sellUnit == 14
+                && BridgeKeyboardEventPolicy.disposition(for: 14, activity: .gameplay,
+                                                         modifierFlags: []) == .hotkey
+                && BridgeKeyboardEventPolicy.disposition(for: 14, activity: .nonGameplay,
+                                                         modifierFlags: []) == .passThrough
+                && BridgeKeyboardEventPolicy.disposition(for: 14, activity: .gameplay,
+                                                         modifierFlags: [.command]) == .passThrough,
+            "physical E sells only during gameplay without a system shortcut modifier"
+        )
+        try expect(
+            saleSource == BridgeRelativePoint(x: 0.25, y: 0.9)
+                && BridgeUnitSale.source(cursor: CGPoint(x: -640, y: 360),
+                                         window: CGRect(x: -1_280, y: 0, width: 1_280, height: 720),
+                                         width: 1_920, height: 1_080) == BridgeRelativePoint(x: 0.5, y: 0.5)
+                && BridgeUnitSale.source(cursor: CGPoint(x: 420, y: 210), window: saleWindow,
+                                         width: 3_840, height: 2_160) == nil
+                && BridgeUnitSale.source(cursor: CGPoint(x: 1_400, y: 500), window: saleWindow,
+                                         width: 3_840, height: 2_160) == nil,
+            "sale cursor mapping excludes title bar and toolbar and supports scaled and fullscreen windows"
+        )
+        try expect(
+            BridgeUnitSale.target(from: BridgeRelativePoint(x: 0.2, y: 0.8)) == BridgeHotkeyTarget.sellLeft
+                && BridgeUnitSale.target(from: BridgeRelativePoint(x: 0.8, y: 0.3)) == BridgeHotkeyTarget.sellRight
+                && BridgeUnitSale.target(from: BridgeRelativePoint(x: 0.5, y: 0.5)) == BridgeHotkeyTarget.sellLeft
+                && BridgeUnitSale.command(from: saleSource!, width: 3_840, height: 2_160)
+                    == "input motionevent DOWN 960 1944; sleep 0.08; input motionevent MOVE 96 2030; input motionevent UP 96 2030\n",
+            "sale holds the hovered unit and releases in the nearest lower corner"
+        )
         let surfaceLayer = """
             RequestedLayerState{SurfaceView[com.riotgames.league.teamfighttactics/com.epicgames.unreal.GameActivity](BLAST)#103 parentId=102}
             """
@@ -939,8 +971,8 @@ enum LauncherTests {
             "app bundle identifier"
         )
         try expect(infoPlist["CFBundleIconFile"] as? String == "Mactician.icns", "launcher icon name")
-        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.2", "launcher version")
-        try expect(infoPlist["CFBundleVersion"] as? String == "57", "launcher build")
+        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.3", "launcher version")
+        try expect(infoPlist["CFBundleVersion"] as? String == "58", "launcher build")
         try expect(
             infoPlist["SUFeedURL"] as? String == "https://sergeinaumov.dev/mactician/updates/appcast.xml",
             "Sparkle appcast URL"
@@ -1038,10 +1070,10 @@ enum LauncherTests {
             "emulator host icon name"
         )
         try expect(
-            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.2",
+            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.3",
             "emulator host version"
         )
-        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "57", "emulator host build")
+        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "58", "emulator host build")
         try expect(
             emulatorHostInfo["CFBundleIdentifier"] as? String
                 == "dev.sergeinaumov.mactician.game-host",

@@ -862,7 +862,7 @@ final class LauncherModel: ObservableObject {
             } else {
                 telemetry.markPerformanceReady()
                 status = "TFT is open"
-                detail = "Space — shop  •  D — reroll  •  F — XP  •  Tab — items/traits  •  V — players/damage  •  Control + Fn + F — fill window."
+                detail = "Space — shop  •  D — reroll  •  F — XP  •  E — sell unit under cursor  •  Tab — items/traits  •  V — players/damage  •  Control + Fn + F — fill window."
                 loginAnimationRepair.start(adb: paths.adb, log: paths.launcherLog, packageName: selectedEdition.packageName)
                 if let emulatorPID {
                     let profile = launchProfile ?? selectedProfile

@@ -1391,6 +1391,8 @@ if "$ADB" -s "$SERIAL" shell test -e "$STREAMING_INSTALL_MANIFEST" \
     print "Corrupt TFT streaming cache removed; TFT will download the required resources again."
 fi
 
+"$ADB" -s "$SERIAL" shell sh -s -- "$PACKAGE" \
+    < "$PROJECT_DIR/scripts/guest-game-focus.sh"
 "$ADB" -s "$SERIAL" shell am start -n "$PACKAGE/$ACTIVITY"
 
 if [[ "$VIEW_CACHE_MANAGED" == 1 ]]; then

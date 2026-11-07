@@ -16,6 +16,7 @@ private enum BridgeAction {
     case shop
     case reroll
     case buyXP
+    case sellUnit
     case toggleItemsAndTraits
     case togglePlayersAndDamage
 }
@@ -40,11 +41,41 @@ enum BridgeHotkeyTarget {
     static let items = BridgeRelativePoint(x: 0.059, y: 0.04)
     static let damage = BridgeRelativePoint(x: 0.947, y: 0.04)
     static let players = BridgeRelativePoint(x: 0.975, y: 0.04)
+    static let sellLeft = BridgeRelativePoint(x: 0.025, y: 0.94)
+    static let sellRight = BridgeRelativePoint(x: 0.975, y: 0.94)
+}
+
+enum BridgeUnitSale {
+    static func source(cursor: CGPoint, window: CGRect, width: Int, height: Int) -> BridgeRelativePoint? {
+        guard width > 0, height > 0, window.width > 0 else { return nil }
+        // The emulator keeps the guest aspect ratio, with its title bar above the image.
+        let imageHeight = window.width * CGFloat(height) / CGFloat(width)
+        let titleHeight = window.height - imageHeight
+        guard titleHeight >= -1, titleHeight <= 80 else { return nil }
+        let image = CGRect(x: window.minX, y: window.maxY - imageHeight,
+                           width: window.width, height: imageHeight)
+        guard image.contains(cursor) else { return nil }
+        return BridgeRelativePoint(x: (cursor.x - image.minX) / image.width,
+                                   y: (cursor.y - image.minY) / image.height)
+    }
+
+    static func target(from source: BridgeRelativePoint) -> BridgeRelativePoint {
+        source.x <= 0.5 ? BridgeHotkeyTarget.sellLeft : BridgeHotkeyTarget.sellRight
+    }
+
+    static func command(from source: BridgeRelativePoint, width: Int, height: Int) -> String {
+        let start = source.pixels(width: width, height: height)
+        let end = target(from: source).pixels(width: width, height: height)
+        return "input motionevent DOWN \(start.x) \(start.y); sleep 0.08; "
+            + "input motionevent MOVE \(end.x) \(end.y); "
+            + "input motionevent UP \(end.x) \(end.y)\n"
+    }
 }
 
 enum BridgeKeyboardBinding {
     static let reroll: UInt16 = 2
     static let buyXP: UInt16 = 3
+    static let sellUnit: UInt16 = 14
     static let playersAndDamage: UInt16 = 9
     static let tab: UInt16 = 48
     static let shop: UInt16 = 49
@@ -54,6 +85,7 @@ enum BridgeKeyboardBinding {
         case shop: return .shop
         case reroll: return .reroll
         case buyXP: return .buyXP
+        case sellUnit: return .sellUnit
         case playersAndDamage: return .togglePlayersAndDamage
         case tab: return .toggleItemsAndTraits
         default: return nil
@@ -263,16 +295,26 @@ private final class BridgeTapDispatcher {
         }
     }
 
-    func send(_ action: BridgeAction) {
+    func send(_ action: BridgeAction, cursor: CGPoint) {
         queue.async { [weak self] in
             guard let self, !stopped else { return }
-            let point = target(for: action).pixels(
-                width: configuration.width,
-                height: configuration.height
-            )
+            let command: String
+            if case .sellUnit = action {
+                guard !CGEventSource.buttonState(.combinedSessionState, button: .left),
+                      let window = gameWindowBounds(),
+                      let source = BridgeUnitSale.source(cursor: cursor, window: window,
+                                                        width: configuration.width,
+                                                        height: configuration.height) else { return }
+                command = BridgeUnitSale.command(from: source, width: configuration.width,
+                                                 height: configuration.height)
+            } else {
+                guard let target = target(for: action) else { return }
+                let point = target.pixels(width: configuration.width, height: configuration.height)
+                command = "input tap \(point.x) \(point.y)\n"
+            }
             do {
                 try ensureShell(configuration)
-                try input?.write(contentsOf: Data("input tap \(point.x) \(point.y)\n".utf8))
+                try input?.write(contentsOf: Data(command.utf8))
             } catch {
                 stopShell()
             }
@@ -286,7 +328,7 @@ private final class BridgeTapDispatcher {
         }
     }
 
-    private func target(for action: BridgeAction) -> BridgeRelativePoint {
+    private func target(for action: BridgeAction) -> BridgeRelativePoint? {
         switch action {
         case .shop:
             return BridgeHotkeyTarget.shop
@@ -294,6 +336,8 @@ private final class BridgeTapDispatcher {
             return BridgeHotkeyTarget.reroll
         case .buyXP:
             return BridgeHotkeyTarget.buyXP
+        case .sellUnit:
+            return nil
         case .toggleItemsAndTraits:
             defer { showTraitsNext.toggle() }
             return showTraitsNext ? BridgeHotkeyTarget.traits : BridgeHotkeyTarget.items
@@ -301,6 +345,20 @@ private final class BridgeTapDispatcher {
             defer { showDamageNext.toggle() }
             return showDamageNext ? BridgeHotkeyTarget.damage : BridgeHotkeyTarget.players
         }
+    }
+
+    private func gameWindowBounds() -> CGRect? {
+        guard let windows = CGWindowListCopyWindowInfo(
+            [.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID
+        ) as? [[CFString: Any]] else { return nil }
+        return windows.compactMap { window -> CGRect? in
+            guard (window[kCGWindowOwnerPID] as? NSNumber)?.int32Value == configuration.targetPID,
+                  (window[kCGWindowLayer] as? NSNumber)?.intValue == 0,
+                  let rawBounds = window[kCGWindowBounds] as? NSDictionary,
+                  let bounds = CGRect(dictionaryRepresentation: rawBounds),
+                  bounds.width >= 500, bounds.height >= 300, bounds.width > bounds.height else { return nil }
+            return bounds
+        }.max { $0.width * $0.height < $1.width * $1.height }
     }
 
     private func ensureShell(_ configuration: BridgeConfiguration) throws {
@@ -421,7 +479,7 @@ private final class BridgeEventTapSession {
                 if let action = BridgeKeyboardBinding.action(for: cocoaEvent.keyCode),
                    type == .keyDown,
                    !cocoaEvent.isARepeat {
-                    dispatcher.send(action)
+                    dispatcher.send(action, cursor: event.location)
                 }
                 return nil
             }

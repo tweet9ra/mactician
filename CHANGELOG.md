@@ -1,8 +1,13 @@
 # Changelog
 
-The current application metadata is version 1.3.2, build 57.
+The current application metadata is version 1.3.3, build 58.
 
 ## Unreleased
+
+## 1.3.3 — 2026-11-07
+
+- Sell the unit under the cursor with **E** using a quick hold and drag to the nearest sell corner.
+- Prevent the white haze caused by keyboard focus over the game surface.
 
 ## 1.3.2 — 2026-11-06
 

@@ -83,6 +83,8 @@ for syntax_script in \
     zsh -o NO_BG_NICE -n "$syntax_script"
 done
 sh -n "$PROJECT_DIR/scripts/guest-vulkan-view-cache.sh"
+sh -n "$PROJECT_DIR/scripts/guest-game-focus.sh"
+python3 "$PROJECT_DIR/scripts/test-game-focus.py"
 
 python3 "$PROJECT_DIR/scripts/test-runtime-early-stop.py" "$LAUNCHER_DIR/Resources/launcher-runtime.command"
 

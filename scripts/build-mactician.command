@@ -123,7 +123,7 @@ TFT_SCREEN_CLASSIFIER_BINARY="$HELPERS/tft-screen-classifier" \
 (
     cd "$PROJECT_DIR"
     shasum -a 256 run-tft-root-affinity.command run-tft-angle-opengl.command \
-        scripts/run-asg-experiment.command scripts/guest-vulkan-view-cache.sh \
+        scripts/run-asg-experiment.command scripts/guest-vulkan-view-cache.sh scripts/guest-game-focus.sh \
         scripts/enable-tft-login-persistence.command \
         launcher/Resources/release-manifest.json launcher/Resources/launcher-runtime.command \
         launcher/Resources/emulator-host.command launcher/Sources/InputBridgeService.swift \
@@ -164,6 +164,7 @@ copy_plain_file "$PROJECT_DIR/scripts/watch-root-pso.command" "$RUNTIME_TEMPLATE
 copy_plain_file "$PROJECT_DIR/scripts/update-tft-performance-mode.command" "$RUNTIME_TEMPLATE/scripts/update-tft-performance-mode.command"
 copy_plain_file "$PROJECT_DIR/scripts/enable-tft-login-persistence.command" "$RUNTIME_TEMPLATE/scripts/enable-tft-login-persistence.command"
 copy_plain_file "$PROJECT_DIR/scripts/guest-vulkan-view-cache.sh" "$RUNTIME_TEMPLATE/scripts/guest-vulkan-view-cache.sh"
+copy_plain_file "$PROJECT_DIR/scripts/guest-game-focus.sh" "$RUNTIME_TEMPLATE/scripts/guest-game-focus.sh"
 for cache_file in libVkLayer_Mactician_buffer_view_cache.so libVkLayer_Mactician_buffer_view_cache.so.sha256; do
     copy_plain_file "$PROJECT_DIR/runtime/vulkan-buffer-view-cache/$cache_file" \
         "$RUNTIME_TEMPLATE/runtime/vulkan-buffer-view-cache/$cache_file"

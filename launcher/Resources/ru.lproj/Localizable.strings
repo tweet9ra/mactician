@@ -113,7 +113,7 @@
 "hotkeys.status.ready" = "Включены для следующего запуска игры";
 "hotkeys.status.active" = "Включены, пока окно игры в фокусе";
 "hotkeys.status.unavailable" = "Хоткеи выключены — мост ввода недоступен";
-"hotkeys.shortcuts" = "Space: Магазин  ·  D: Обновить  ·  F: Купить опыт  ·  Tab: Предметы / трейты  ·  V: Игроки / урон\nControl + Fn + F: Развернуть окно";
+"hotkeys.shortcuts" = "Space: Магазин  ·  D: Обновить  ·  F: Купить опыт  ·  E: Продать юнита под курсором  ·  Tab: Предметы / трейты  ·  V: Игроки / урон\nControl + Fn + F: Развернуть окно";
 
 "settings.title" = "Настройки Mactician";
 "settings.description" = "Игра, производительность, горячие клавиши и обслуживание.";

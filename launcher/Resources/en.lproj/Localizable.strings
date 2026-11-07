@@ -113,7 +113,7 @@
 "hotkeys.status.ready" = "Enabled for the next game launch";
 "hotkeys.status.active" = "Enabled while the game window is focused";
 "hotkeys.status.unavailable" = "Hotkeys are off — the input bridge is unavailable";
-"hotkeys.shortcuts" = "Space: Shop  ·  D: Reroll  ·  F: Buy XP  ·  Tab: Items / traits  ·  V: Players / damage\nControl + Fn + F: Fill window";
+"hotkeys.shortcuts" = "Space: Shop  ·  D: Reroll  ·  F: Buy XP  ·  E: Sell unit under cursor  ·  Tab: Items / traits  ·  V: Players / damage\nControl + Fn + F: Fill window";
 
 "settings.title" = "Mactician settings";
 "settings.description" = "Game, performance, hotkeys, and maintenance.";
