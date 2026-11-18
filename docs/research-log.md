@@ -761,3 +761,8 @@ The Spirit Blossom Yunara HP offset persisted across scale/resolution/profile
 changes and a fresh Trial. Shork had normal HP placement at the same settings,
 including movement and the transition from stage 1-1 to 1-2. Changing tactician
 is a verified workaround on this installation, not an HP fix in this release.
+
+The 1.3.4 publication was interrupted before appcast replacement. Its DMG upload
+was incomplete, and the temporary local artifact was lost. The same fixes are
+released as 1.3.5 (build 60) with a new artifact URL; the existing 1.3.4 tag is
+preserved. Release worktrees and artifacts now use a persistent local directory.
