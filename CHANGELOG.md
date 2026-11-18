@@ -1,8 +1,13 @@
 # Changelog
 
-The current application metadata is version 1.3.3, build 58.
+The current application metadata is version 1.3.4, build 59.
 
 ## Unreleased
+
+## 1.3.4 — 2026-11-18
+
+- Restore native framebuffer resolution and the configured frame-rate limit after TFT 18.7 overrides the launcher graphics profile.
+- Add 75% interface scale for a smaller game UI.
 
 ## 1.3.3 — 2026-11-07
 

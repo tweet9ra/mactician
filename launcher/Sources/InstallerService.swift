@@ -754,9 +754,17 @@ final class InstallerService {
     }
 
     static func prepareAndroidGraphicsProfile(at url: URL) throws {
-        let profile = try String(contentsOf: url, encoding: .utf8)
+        var profile = try String(contentsOf: url, encoding: .utf8)
             .replacingOccurrences(of: "[Android_Codex DeviceProfile]", with: "[Android_MatchedFragments DeviceProfile]")
             .replacingOccurrences(of: "BaseProfileName=Android_MatchedFragments", with: "BaseProfileName=Android")
+        // TFT 18.7's matched fragments override our CVars, including the native
+        // framebuffer size. Saved/Config needs empty values, not !ClearArray.
+        if !profile.contains("\nMatchingRules=()\n") {
+            profile = profile.replacingOccurrences(
+                of: "[Android_MatchedFragments DeviceProfile]",
+                with: "[Android_MatchedFragments DeviceProfile]\nMatchingRules=()\nFragmentIncludes="
+            )
+        }
         try profile.write(to: url, atomically: true, encoding: .utf8)
     }
 

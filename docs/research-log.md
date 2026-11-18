@@ -732,3 +732,32 @@ survived more than four minutes in the same live match with an empty Android
 crash buffer. Unit tests cover command-line generation, preservation of all
 graphics CVars, parent selection, and repeated profile preparation. Other
 editions and hardware were not exercised in this validation.
+
+## TFT 18.7 framebuffer and interface scale regression (2026-11-18)
+
+Global `18.7-5951209` applied `Android_LowPerf_Fragment` and other matched
+fragments after the Mactician profile. They replaced
+`r.MobileContentScaleFactor=0` with `1.5` and the default 60 FPS limit with 30.
+On a 3840x2160 Android display, Unreal allocated a 1920x1080 framebuffer that
+SurfaceFlinger stretched 2x. The preceding 18.6 session used native 3840x2160.
+
+The runtime profile now clears inherited fragment selection with
+`MatchingRules=()` and `FragmentIncludes=` in `Android_MatchedFragments`.
+Generated Saved/Config files required these empty values: the tested
+`!MatchingRules=ClearArray` / `!FragmentIncludes=ClearArray` form did not prevent
+fragment selection. Normal Android device detection remains enabled for the
+18.6 match-entry fix. After a normal launcher restart, Unreal logged native
+3840x2160, scale factor 0 and default 60 FPS; SurfaceFlinger no longer stretched
+the framebuffer. Existing profile CVars are preserved.
+
+The launcher also accepts 75% interface scale (`ApplicationScale=0.75`). It was
+visually checked in the same Tocker's Trial on M1 Max and persisted through a
+normal restart. The local validation app was built from the 1.3.3 release tag
+with only these graphics/scale changes. Compilation and signature verification
+passed. For 1.3.4, the full `test-mactician.command` and
+`verify-repository.command` checks passed in an isolated release worktree.
+
+The Spirit Blossom Yunara HP offset persisted across scale/resolution/profile
+changes and a fresh Trial. Shork had normal HP placement at the same settings,
+including movement and the transition from stage 1-1 to 1-2. Changing tactician
+is a verified workaround on this installation, not an HP fix in this release.

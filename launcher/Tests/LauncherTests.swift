@@ -971,8 +971,8 @@ enum LauncherTests {
             "app bundle identifier"
         )
         try expect(infoPlist["CFBundleIconFile"] as? String == "Mactician.icns", "launcher icon name")
-        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.3", "launcher version")
-        try expect(infoPlist["CFBundleVersion"] as? String == "58", "launcher build")
+        try expect(infoPlist["CFBundleShortVersionString"] as? String == "1.3.4", "launcher version")
+        try expect(infoPlist["CFBundleVersion"] as? String == "59", "launcher build")
         try expect(
             infoPlist["SUFeedURL"] as? String == "https://sergeinaumov.dev/mactician/updates/appcast.xml",
             "Sparkle appcast URL"
@@ -1070,10 +1070,10 @@ enum LauncherTests {
             "emulator host icon name"
         )
         try expect(
-            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.3",
+            emulatorHostInfo["CFBundleShortVersionString"] as? String == "1.3.4",
             "emulator host version"
         )
-        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "58", "emulator host build")
+        try expect(emulatorHostInfo["CFBundleVersion"] as? String == "59", "emulator host build")
         try expect(
             emulatorHostInfo["CFBundleIdentifier"] as? String
                 == "dev.sergeinaumov.mactician.game-host",
@@ -1131,13 +1131,15 @@ enum LauncherTests {
             "saved guest resource validation"
         )
         try expect(
-            InterfaceScaleOptions.percentages == [100, 125, 150, 175, 200]
+            InterfaceScaleOptions.percentages == [75, 100, 125, 150, 175, 200]
+                && InterfaceScaleOptions.selection(saved: 75) == 75
                 && InterfaceScaleOptions.selection(saved: 175) == 175
                 && InterfaceScaleOptions.selection(saved: 225) == 100,
             "UI scale choices and saved selection validation"
         )
         try expect(
-            InterfaceScaleOptions.runtimeValue(percent: 175) == "1.75"
+            InterfaceScaleOptions.runtimeValue(percent: 75) == "0.75"
+                && InterfaceScaleOptions.runtimeValue(percent: 175) == "1.75"
                 && InterfaceScaleOptions.runtimeValue(percent: 200) == "2.0"
                 && InterfaceScaleOptions.runtimeValue(percent: 225) == nil,
             "UI scale runtime value"
@@ -1309,11 +1311,12 @@ enum LauncherTests {
             let prepared = try String(contentsOf: graphicsProfile, encoding: .utf8)
             try expect(
                 prepared.contains("[Android_MatchedFragments DeviceProfile]")
+                    && prepared.contains("\nMatchingRules=()\nFragmentIncludes=\n")
                     && prepared.contains("BaseProfileName=Android\n")
                     && !prepared.contains("BaseProfileName=Android_MatchedFragments")
                     && prepared.split(separator: "\n").filter { $0.hasPrefix("CVars=") }
                         == original.split(separator: "\n").filter { $0.hasPrefix("CVars=") },
-                "preserve all graphics CVars on the detected profile without an inheritance cycle"
+                "preserve graphics CVars without fragment overrides or an inheritance cycle"
             )
             try InstallerService.prepareAndroidGraphicsProfile(at: graphicsProfile)
             try expect(try String(contentsOf: graphicsProfile, encoding: .utf8) == prepared,

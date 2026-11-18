@@ -261,9 +261,9 @@ if [[ ! "$DISPLAY_DENSITY" =~ '^[0-9]+$' ]] || (( DISPLAY_DENSITY < 120 || DISPL
     print "TFT_DISPLAY_DENSITY must be an integer from 120 to 640."
     exit 2
 fi
-if [[ "$UI_SCALE" != "1.0" && "$UI_SCALE" != "1.25" && "$UI_SCALE" != "1.5" \
+if [[ "$UI_SCALE" != "0.75" && "$UI_SCALE" != "1.0" && "$UI_SCALE" != "1.25" && "$UI_SCALE" != "1.5" \
         && "$UI_SCALE" != "1.75" && "$UI_SCALE" != "2.0" ]]; then
-    print "TFT_UI_SCALE must be one of 1.0, 1.25, 1.5, 1.75, or 2.0."
+    print "TFT_UI_SCALE must be one of 0.75, 1.0, 1.25, 1.5, 1.75, or 2.0."
     exit 2
 fi
 if [[ "$PERFORMANCE_MODE" != "0" && "$PERFORMANCE_MODE" != "1" ]]; then

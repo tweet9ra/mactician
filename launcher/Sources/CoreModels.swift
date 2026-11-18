@@ -445,7 +445,7 @@ struct GuestResourceConfiguration: Equatable {
 
 enum InterfaceScaleOptions {
     static let defaultPercent = 100
-    static let percentages = [100, 125, 150, 175, 200]
+    static let percentages = [75, 100, 125, 150, 175, 200]
 
     static func selection(saved: Int) -> Int {
         percentages.contains(saved) ? saved : defaultPercent
@@ -453,6 +453,7 @@ enum InterfaceScaleOptions {
 
     static func runtimeValue(percent: Int) -> String? {
         switch percent {
+        case 75: "0.75"
         case 100: "1.0"
         case 125: "1.25"
         case 150: "1.5"

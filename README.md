@@ -19,7 +19,7 @@ Built for two tacticians. Shared with everyone.
 
 ## Project status
 
-- Version: **1.3.3** (build 58)
+- Version: **1.3.4** (build 59)
 - Host architecture: **Apple Silicon (`arm64`)**
 - Minimum deployment target: **macOS 12.0**, enforced by the build target and
   runtime preflight
@@ -45,7 +45,7 @@ is configured independently.
   image archives.
 - Verifies every downloaded component and bundled game split with SHA-256.
 - Creates, provisions, starts, stops, repairs, and resets a dedicated AVD.
-- Offers resolution, UI scale, Android RAM, vCPU, game-language, and three
+- Offers resolution, UI scale from 75% to 200%, Android RAM, vCPU, game-language, and three
   graphics-detail controls, including a reversible Maximum FPS profile.
 - Preserves the local Android runtime, Riot sign-in, game data, and launcher
   preferences across full application updates.
