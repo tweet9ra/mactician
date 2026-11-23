@@ -8,8 +8,19 @@ enum MacticianIdentity {
     static let keychainService = bundleIdentifier
     static let loggingSubsystem = bundleIdentifier
     static let websiteURL = URL(string: "https://sergeinaumov.dev/mactician")!
-    static let feedbackURL = URL(string: "https://sergeinaumov.dev/mactician/feedback")!
     static let donateURL = URL(string: "https://sergeinaumov.dev/mactician/donate")!
+    static let contactEmail = "tweet9ra@gmail.com"
+    static let contactURL = URL(string: "mailto:\(contactEmail)")!
+    private static var riotSite: URL {
+        let locale = Bundle.main.preferredLocalizations.first == "ru" ? "ru-ru" : "en-us"
+        return URL(string: "https://teamfighttactics.leagueoflegends.com/\(locale)/")!
+    }
+    static var riotDownloadURL: URL {
+        riotSite.appendingPathComponent("download", isDirectory: true)
+    }
+    static var riotMacNewsURL: URL {
+        riotSite.appendingPathComponent("news/game-updates/teamfight-tactics-patch-18-7", isDirectory: true)
+    }
     static let privacyPolicyURL = URL(string: "https://sergeinaumov.dev/mactician/privacy")!
     static let extendedDiagnosticsURL = URL(
         string: "https://sergeinaumov.dev/mactician/privacy#extended-diagnostics"
@@ -18,7 +29,6 @@ enum MacticianIdentity {
     static let technicalStoryURL = URL(
         string: "https://sergeinaumov.dev/writing/how-i-built-mactician"
     )!
-    static let issueURL = URL(string: "https://github.com/tweet9ra/mactician/issues/new/choose")!
     static let gameUpdateURL = URL(
         string: "https://sergeinaumov.dev/mactician/updates/game/manifest.json"
     )!

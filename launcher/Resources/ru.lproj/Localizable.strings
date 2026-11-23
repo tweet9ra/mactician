@@ -3,9 +3,17 @@
 "settings.open" = "Открыть настройки Mactician";
 "about.descriptor" = "Лаунчер TFT для Mac с Apple Silicon";
 
-"hero.eyebrow" = "MACTICIAN · ЛАУНЧЕР TFT";
-"hero.title" = "Продолжайте играть\nв TFT на Mac.";
-"hero.description" = "Быстро. Стабильно. Открытый код.";
+"farewell.title" = "TFT снова на Mac";
+"farewell.riot" = "С патча 18.7 на Mac с чипом серии M можно играть в официальном клиенте Riot.";
+"farewell.download" = "Скачать TFT для Mac";
+"farewell.news" = "Новость Riot о патче 18.7";
+"farewell.thanks" = "Спасибо, что играли через Mactician!";
+"farewell.message" = "Я прекращаю поддержку лаунчера. Если Mactician вам ещё нужен или что-то перестало работать, напишите мне. Возможно, я вернусь к проекту.";
+"farewell.donation" = "Если хотите сказать спасибо за разработку лаунчера и его регулярные обновления, можно оставить донат.";
+"farewell.donate" = "Поддержать автора";
+"farewell.author" = "Сергей Наумов";
+"farewell.continue" = "Продолжить в Mactician";
+"farewell.return" = "О TFT на Mac";
 
 "footer.private_build" = "Бесплатно и с открытым исходным кодом";
 "footer.apple_silicon" = "Apple Silicon";
@@ -33,8 +41,6 @@
 "effects_quality.maximum.detail" = "67% масштаба 3D, меньше эффектов и более простой LOD";
 
 "action.play" = "Играть";
-"action.suggest_improvement" = "Предложить улучшение";
-"action.donate" = "Поддержать";
 "action.update_game" = "Обновить игру";
 "action.install" = "Установить";
 "action.pause" = "Приостановить";
@@ -206,5 +212,3 @@
 "edition.download_on_selection" = "При установке";
 "edition.install.description" = "Установите выбранную версию игры. Другая версия и её аккаунт сохранятся.";
 "action.settings" = "Настройки";
-"community.title" = "Нравится Mactician?";
-"community.description" = "Поддержите его развитие.";

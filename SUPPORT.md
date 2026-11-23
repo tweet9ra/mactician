@@ -1,13 +1,8 @@
 # Support
 
-Mactician is maintained on a best-effort basis without a service-level
-agreement. Support focuses on the latest Mactician release. TFT and Android
-Emulator updates can temporarily break compatibility with a pinned release.
-
-Use [GitHub Issues](https://github.com/tweet9ra/mactician/issues) for reproducible
-Mactician bugs and feature requests. Personal
-messages are not a support channel, and feature requests are not guaranteed to
-be implemented.
+Active maintenance of Mactician has ended. If you still use the launcher or run
+into a problem, email me at [tweet9ra@gmail.com](mailto:tweet9ra@gmail.com).
+I may return to the project if players still need it.
 
 A useful bug report includes:
 

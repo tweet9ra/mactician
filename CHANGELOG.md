@@ -1,8 +1,10 @@
 # Changelog
 
-The current application metadata is version 1.3.5, build 60.
+The current application metadata is version 1.3.6, build 61.
 
 ## Unreleased
+
+- Thank Mactician players and link to Riot’s official Mac client and patch 18.7 notes. Players can email the maintainer or leave a tip for past development and updates.
 
 ## 1.3.5 — 2026-11-18
 

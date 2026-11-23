@@ -4,20 +4,12 @@ import SwiftUI
 @main
 struct MacticianApp: App {
     @NSApplicationDelegateAdaptor(LauncherAppDelegate.self) private var appDelegate
-    @StateObject private var model: LauncherModel
-    @StateObject private var updateController: LauncherUpdateController
+    @StateObject private var updateController = LauncherUpdateController()
     @State private var showAbout = false
-
-    init() {
-        let model = LauncherModel()
-        _model = StateObject(wrappedValue: model)
-        _updateController = StateObject(wrappedValue: LauncherUpdateController())
-        LauncherAppDelegate.pendingModel = model
-    }
 
     var body: some Scene {
         WindowGroup("Mactician") {
-            LauncherView(model: model, updateController: updateController)
+            LauncherView(updateController: updateController, openLauncher: appDelegate.openLauncher)
                 .frame(minWidth: 1080, minHeight: 660)
                 .sheet(isPresented: $showAbout) {
                     MacticianAboutView()
@@ -75,7 +67,7 @@ struct MacticianAboutView: View {
                 aboutLink("Website", destination: MacticianIdentity.websiteURL)
                 aboutLink("GitHub", destination: MacticianIdentity.sourceURL)
                 aboutLink("Technical story", destination: MacticianIdentity.technicalStoryURL)
-                aboutLink("Report an issue", destination: MacticianIdentity.issueURL)
+                aboutLink("Report an issue", destination: MacticianIdentity.contactURL)
             }
         }
         .foregroundColor(LauncherTheme.ColorToken.textPrimary)
@@ -94,7 +86,14 @@ struct MacticianAboutView: View {
 
 @MainActor
 final class LauncherAppDelegate: NSObject, NSApplicationDelegate {
-    static weak var pendingModel: LauncherModel?
+    private var model: LauncherModel?
+
+    func openLauncher() -> LauncherModel {
+        if let model { return model }
+        let launcher = LauncherModel()
+        model = launcher
+        return launcher
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -106,7 +105,7 @@ final class LauncherAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        Self.pendingModel?.shutdown()
+        model?.shutdown()
         return .terminateNow
     }
 }

@@ -19,12 +19,11 @@ Built for two tacticians. Shared with everyone.
 
 ## Project status
 
-- Version: **1.3.5** (build 60)
+- Version: **1.3.6** (build 61) — local preview
 - Host architecture: **Apple Silicon (`arm64`)**
 - Minimum deployment target: **macOS 12.0**, enforced by the build target and
   runtime preflight
-- Status: **experimental, best effort**; there is no support or compatibility
-  SLA
+- Active maintenance has ended. Riot restored native Mac support in patch 18.7. [Riot’s patch notes](https://teamfighttactics.leagueoflegends.com/en-us/news/game-updates/teamfight-tactics-patch-18-7/)
 - Compatibility is pinned to TFT `18.4-5637330`, Android Emulator 37.1.11,
   and Android 36. A game or emulator update can require a new Mactician release.
 
@@ -54,7 +53,7 @@ is configured independently.
 - Provides game hotkeys for shop, reroll, XP, selling the unit under the cursor
   with **E**, item/trait and player/damage tabs,
   plus the macOS window-fill shortcut.
-- Links to the feedback board and [donations](https://app.lava.top/mactician?tabId=donate).
+- Links to Riot’s Mac download and patch notes, the maintainer’s email, and an optional donation.
 - Uses a Sparkle appcast with Ed25519 archive verification for updates; public
   releases are Developer ID signed and Apple-notarized.
 - Sends minimized activation events, a versioned one-time fresh census, and an

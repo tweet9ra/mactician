@@ -2,131 +2,44 @@ import AppKit
 import SwiftUI
 
 struct LauncherView: View {
-    @ObservedObject var model: LauncherModel
     @ObservedObject var updateController: LauncherUpdateController
-    @State private var showSettings = false
-    @State private var showResetConfirmation = false
+    let openLauncher: () -> LauncherModel
+    @State private var model: LauncherModel?
 
-    private let heroImage: NSImage? = {
-        guard let url = Bundle.main.url(forResource: "MacticianHero", withExtension: "png") else {
-            return nil
-        }
-        return NSImage(contentsOf: url)
-    }()
+    private let heroImage = Bundle.main.url(forResource: "MacticianHero", withExtension: "png")
+        .flatMap(NSImage.init(contentsOf:))
 
     var body: some View {
         GeometryReader { geometry in
-            let surfaceWidth = max(0, geometry.size.width - LauncherTheme.Metric.outerInset * 2)
-            let surfaceHeight = max(0, geometry.size.height - LauncherTheme.Metric.outerInset * 2)
-            ZStack {
-                LauncherTheme.ColorToken.window.ignoresSafeArea()
-                clientSurface(
-                    compactHeight: geometry.size.height < 720,
-                    availableWidth: surfaceWidth,
-                    availableHeight: surfaceHeight
-                )
-            }
-        }
-        .preferredColorScheme(.dark)
-        .sheet(isPresented: Binding(
-            get: {
-                model.shouldShowTelemetryNotice && !model.isNativeIPadRuntimeSelected
-            },
-            set: { isPresented in
-                if !isPresented && !model.isNativeIPadRuntimeSelected {
-                    model.shouldShowTelemetryNotice = false
-                }
-            }
-        )) {
-            LauncherTelemetryNoticeView(model: model)
-                .interactiveDismissDisabled()
-        }
-        .sheet(isPresented: $showSettings) {
-            LauncherSettingsView(
-                model: model,
-                updateController: updateController,
-                showResetConfirmation: $showResetConfirmation
-            )
-        }
-        .sheet(item: $model.announcement) { announcement in
-            LauncherAnnouncementView(
-                announcement: announcement,
-                dismiss: model.dismissAnnouncement
-            )
-            .interactiveDismissDisabled()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            model.refreshHotkeyStatus()
-        }
-    }
-
-    private func clientSurface(
-        compactHeight: Bool,
-        availableWidth: CGFloat,
-        availableHeight: CGFloat
-    ) -> some View {
-        ZStack {
-            artwork
-
             VStack(spacing: 0) {
                 header
                 ScrollView {
-                    VStack(spacing: 0) {
-                        hero(compact: compactHeight)
-                        LauncherStateDeck(model: model, showSettings: $showSettings)
-                        communityActions
-                            .padding(.top, LauncherTheme.Spacing.large)
+                    VStack(alignment: .leading, spacing: LauncherTheme.Spacing.large) {
+                        if let model {
+                            LauncherGameControls(model: model, updateController: updateController)
+                                .padding(.top, LauncherTheme.Spacing.large)
+                        } else {
+                            hero(compact: geometry.size.height < 720)
+                            farewellNote
+                        }
                     }
                     .padding(.horizontal, LauncherTheme.Metric.stateDeckInset)
                     .padding(.bottom, LauncherTheme.Spacing.large)
+                    .frame(maxWidth: LauncherTheme.Metric.contentMaxWidth)
                     .frame(maxWidth: .infinity)
                 }
                 footer
             }
-            .frame(width: availableWidth)
-        }
-        .frame(width: availableWidth, height: availableHeight)
-        .background(LauncherTheme.ColorToken.surface)
-        .clipShape(
-            RoundedRectangle(cornerRadius: LauncherTheme.Metric.surfaceRadius, style: .continuous)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: LauncherTheme.Metric.surfaceRadius, style: .continuous)
-                .stroke(LauncherTheme.ColorToken.neutralBorder, lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.52), radius: 22, y: 10)
-    }
-
-    private var artwork: some View {
-        GeometryReader { geometry in
-            ZStack {
-                if let heroImage {
-                    Image(nsImage: heroImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                }
-
-                LinearGradient(
-                    stops: [
-                        .init(color: LauncherTheme.ColorToken.window.opacity(0.65), location: 0),
-                        .init(color: LauncherTheme.ColorToken.window.opacity(0.34), location: 0.34),
-                        .init(color: LauncherTheme.ColorToken.window.opacity(0.76), location: 0.7),
-                        .init(color: LauncherTheme.ColorToken.window.opacity(0.98), location: 1)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                LinearGradient(
-                    colors: [LauncherTheme.ColorToken.window.opacity(0.78), .clear],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
+            .background(LauncherTheme.ColorToken.surface)
+            .clipShape(RoundedRectangle(cornerRadius: LauncherTheme.Metric.surfaceRadius))
+            .overlay {
+                RoundedRectangle(cornerRadius: LauncherTheme.Metric.surfaceRadius)
+                    .strokeBorder(LauncherTheme.ColorToken.neutralBorder)
             }
+            .padding(LauncherTheme.Metric.outerInset)
         }
-        .accessibilityHidden(true)
-        .allowsHitTesting(false)
+        .background(LauncherTheme.ColorToken.window.ignoresSafeArea())
+        .preferredColorScheme(.dark)
     }
 
     private var header: some View {
@@ -145,6 +58,25 @@ struct LauncherView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityHidden(true)
 
+            if model != nil {
+                Button {
+                    model = nil
+                } label: {
+                    Label(LauncherL10n.text("farewell.return"), systemImage: "chevron.left")
+                }
+                .buttonStyle(.link)
+            } else {
+                Button {
+                    model = openLauncher()
+                } label: {
+                    HStack(spacing: LauncherTheme.Spacing.small) {
+                        Text(LauncherL10n.text("farewell.continue"))
+                        Image(systemName: "chevron.right").accessibilityHidden(true)
+                    }
+                }
+                .buttonStyle(LauncherSecondaryButtonStyle())
+            }
+
             Text(LauncherBuildInfo.display)
                 .font(.system(size: 12, weight: .medium, design: .monospaced))
                 .foregroundColor(LauncherTheme.ColorToken.textSecondary)
@@ -156,65 +88,106 @@ struct LauncherView: View {
     }
 
     private func hero(compact: Bool) -> some View {
-        let prominent = model.mode == .ready && !model.isNativeIPadRuntimeSelected
-        return HStack {
-            VStack(alignment: .leading, spacing: LauncherTheme.Spacing.regular) {
-                Text(LauncherL10n.text("hero.title"))
-                    .font(.system(size: compact ? (prominent ? 38 : 32) : 44, weight: .black, design: .serif))
-                    .lineSpacing(0)
-                    .foregroundColor(LauncherTheme.ColorToken.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .shadow(color: Color.black.opacity(0.45), radius: 6, y: 2)
+        VStack(alignment: .leading, spacing: LauncherTheme.Spacing.regular) {
+            Text(LauncherL10n.text("farewell.title"))
+                .font(.system(size: compact ? 46 : 56, weight: .bold, design: .serif))
+                .foregroundColor(LauncherTheme.ColorToken.textPrimary)
+                .accessibilityAddTraits(.isHeader)
 
-                Text(LauncherL10n.text("hero.description"))
-                    .font(.system(size: compact ? 17 : 19, weight: .medium))
-                    .foregroundColor(LauncherTheme.ColorToken.textSecondary)
+            Text(LauncherL10n.text("farewell.riot"))
+                .font(.system(size: 17))
+                .lineSpacing(3)
+                .foregroundColor(LauncherTheme.ColorToken.textSecondary)
+                .frame(maxWidth: 470, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: LauncherTheme.Spacing.large) {
+                Link(destination: MacticianIdentity.riotDownloadURL) {
+                    Label(LauncherL10n.text("farewell.download"), systemImage: "arrow.down.circle")
+                }
+                .buttonStyle(LauncherPrimaryButtonStyle())
+
+                Link(destination: MacticianIdentity.riotMacNewsURL) {
+                    HStack(spacing: 5) {
+                        Text(LauncherL10n.text("farewell.news"))
+                        Image(systemName: "arrow.up.right").accessibilityHidden(true)
+                    }
+                }
+                .buttonStyle(.link)
+                .foregroundColor(LauncherTheme.ColorToken.textPrimary)
             }
-            Spacer()
+            .padding(.top, LauncherTheme.Spacing.small)
         }
         .padding(.horizontal, LauncherTheme.Metric.stateDeckPadding)
-        .frame(height: compact ? (prominent ? 176 : 144) : (prominent ? 296 : 196), alignment: .leading)
+        .padding(.vertical, LauncherTheme.Spacing.large)
+        .frame(maxWidth: .infinity, minHeight: compact ? 245 : 300, alignment: .leading)
+        .background {
+            if let heroImage {
+                GeometryReader { geometry in
+                    Image(nsImage: heroImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width * 0.55, height: geometry.size.height)
+                        .clipped()
+                        .mask(LinearGradient(
+                            stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.36)],
+                            startPoint: .leading, endPoint: .trailing
+                        ))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                .accessibilityHidden(true)
+                .allowsHitTesting(false)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: LauncherTheme.Metric.surfaceRadius))
     }
 
-    private var communityActions: some View {
-        HStack(spacing: LauncherTheme.Spacing.large) {
-            Image(systemName: "heart.fill")
-                .font(.system(size: 28))
-                .foregroundColor(LauncherTheme.ColorToken.interactive)
-                .frame(width: 36)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 6) {
-                Text(LauncherL10n.text("community.title"))
-                    .font(.system(size: 18, weight: .semibold))
+    private var farewellNote: some View {
+        HStack(spacing: LauncherTheme.Spacing.xLarge) {
+            VStack(alignment: .leading, spacing: LauncherTheme.Spacing.medium) {
+                Text(LauncherL10n.text("farewell.thanks"))
+                    .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(LauncherTheme.ColorToken.textPrimary)
-                Text(LauncherL10n.text("community.description"))
-                    .font(.system(size: 15))
+                    .accessibilityAddTraits(.isHeader)
+
+                Text(LauncherL10n.text("farewell.message"))
+                    .font(.system(size: 16))
+                    .lineSpacing(3)
                     .foregroundColor(LauncherTheme.ColorToken.textSecondary)
-            }
-            Spacer(minLength: LauncherTheme.Spacing.small)
+                    .fixedSize(horizontal: false, vertical: true)
 
-            Link(destination: MacticianIdentity.donateURL) {
-                Label(LauncherL10n.text("action.donate"), systemImage: "heart")
-                    .frame(minWidth: 106)
+                HStack(spacing: LauncherTheme.Spacing.regular) {
+                    Text(LauncherL10n.text("farewell.author"))
+                        .font(.system(size: 15, weight: .medium, design: .serif).italic())
+                        .foregroundColor(LauncherTheme.ColorToken.textPrimary)
+                    Link(destination: MacticianIdentity.contactURL) {
+                        Label(MacticianIdentity.contactEmail, systemImage: "envelope")
+                    }
+                    .buttonStyle(.link)
+                }
+                .padding(.top, LauncherTheme.Spacing.small)
             }
-            .buttonStyle(LauncherActionButtonStyle(kind: .support))
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Link(destination: MacticianIdentity.feedbackURL) {
-                Label(LauncherL10n.text("action.suggest_improvement"), systemImage: "lightbulb")
+            Divider()
+
+            VStack(alignment: .leading, spacing: LauncherTheme.Spacing.regular) {
+                Text(LauncherL10n.text("farewell.donation"))
+                    .font(.system(size: 14))
+                    .lineSpacing(2)
+                    .foregroundColor(LauncherTheme.ColorToken.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Link(destination: MacticianIdentity.donateURL) {
+                    Label(LauncherL10n.text("farewell.donate"), systemImage: "heart")
+                }
+                .buttonStyle(LauncherActionButtonStyle(kind: .support))
             }
-            .buttonStyle(LauncherActionButtonStyle(kind: .secondary))
+            .frame(width: 248, alignment: .leading)
         }
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, LauncherTheme.Metric.stateDeckPadding)
-        .padding(.vertical, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color(red: 0.06, green: 0.035, blue: 0.12).opacity(0.88))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(LauncherTheme.ColorToken.interactive.opacity(0.65), lineWidth: 1)
-        )
+        .padding(.vertical, LauncherTheme.Spacing.large)
+        .launcherSurface()
     }
 
     private var footer: some View {
@@ -236,5 +209,46 @@ struct LauncherView: View {
         .foregroundColor(LauncherTheme.ColorToken.textSecondary)
         .padding(.horizontal, LauncherTheme.Metric.stateDeckInset + 12)
         .frame(height: 44)
+    }
+}
+
+private struct LauncherGameControls: View {
+    @ObservedObject var model: LauncherModel
+    @ObservedObject var updateController: LauncherUpdateController
+    @State private var showSettings = false
+    @State private var showResetConfirmation = false
+
+    var body: some View {
+        LauncherStateDeck(model: model, showSettings: $showSettings)
+            .sheet(isPresented: Binding(
+                get: {
+                    model.shouldShowTelemetryNotice && !model.isNativeIPadRuntimeSelected
+                },
+                set: { isPresented in
+                    if !isPresented && !model.isNativeIPadRuntimeSelected {
+                        model.shouldShowTelemetryNotice = false
+                    }
+                }
+            )) {
+                LauncherTelemetryNoticeView(model: model)
+                    .interactiveDismissDisabled()
+            }
+            .sheet(isPresented: $showSettings) {
+                LauncherSettingsView(
+                    model: model,
+                    updateController: updateController,
+                    showResetConfirmation: $showResetConfirmation
+                )
+            }
+            .sheet(item: $model.announcement) { announcement in
+                LauncherAnnouncementView(
+                    announcement: announcement,
+                    dismiss: model.dismissAnnouncement
+                )
+                .interactiveDismissDisabled()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                model.refreshHotkeyStatus()
+            }
     }
 }
