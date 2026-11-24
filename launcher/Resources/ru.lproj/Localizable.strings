@@ -12,7 +12,7 @@
 "farewell.donation" = "Если хотите сказать спасибо за разработку лаунчера и его регулярные обновления, можно оставить донат.";
 "farewell.donate" = "Поддержать автора";
 "farewell.author" = "Сергей Наумов";
-"farewell.continue" = "Продолжить в Mactician";
+"farewell.play" = "Играть через Mactician";
 "farewell.return" = "О TFT на Mac";
 
 "footer.private_build" = "Бесплатно и с открытым исходным кодом";

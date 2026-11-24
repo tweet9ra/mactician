@@ -65,16 +65,6 @@ struct LauncherView: View {
                     Label(LauncherL10n.text("farewell.return"), systemImage: "chevron.left")
                 }
                 .buttonStyle(.link)
-            } else {
-                Button {
-                    model = openLauncher()
-                } label: {
-                    HStack(spacing: LauncherTheme.Spacing.small) {
-                        Text(LauncherL10n.text("farewell.continue"))
-                        Image(systemName: "chevron.right").accessibilityHidden(true)
-                    }
-                }
-                .buttonStyle(LauncherSecondaryButtonStyle())
             }
 
             Text(LauncherBuildInfo.display)
@@ -101,22 +91,29 @@ struct LauncherView: View {
                 .frame(maxWidth: 470, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(spacing: LauncherTheme.Spacing.large) {
+            HStack(spacing: LauncherTheme.Spacing.medium) {
+                Button {
+                    model = openLauncher()
+                } label: {
+                    Label(LauncherL10n.text("farewell.play"), systemImage: "play.fill")
+                }
+                .buttonStyle(LauncherActionButtonStyle())
+
                 Link(destination: MacticianIdentity.riotDownloadURL) {
                     Label(LauncherL10n.text("farewell.download"), systemImage: "arrow.down.circle")
                 }
-                .buttonStyle(LauncherPrimaryButtonStyle())
-
-                Link(destination: MacticianIdentity.riotMacNewsURL) {
-                    HStack(spacing: 5) {
-                        Text(LauncherL10n.text("farewell.news"))
-                        Image(systemName: "arrow.up.right").accessibilityHidden(true)
-                    }
-                }
-                .buttonStyle(.link)
-                .foregroundColor(LauncherTheme.ColorToken.textPrimary)
+                .buttonStyle(LauncherActionButtonStyle(kind: .secondary))
             }
             .padding(.top, LauncherTheme.Spacing.small)
+
+            Link(destination: MacticianIdentity.riotMacNewsURL) {
+                HStack(spacing: 5) {
+                    Text(LauncherL10n.text("farewell.news"))
+                    Image(systemName: "arrow.up.right").accessibilityHidden(true)
+                }
+            }
+            .buttonStyle(.link)
+            .foregroundColor(LauncherTheme.ColorToken.textPrimary)
         }
         .padding(.horizontal, LauncherTheme.Metric.stateDeckPadding)
         .padding(.vertical, LauncherTheme.Spacing.large)
